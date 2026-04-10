@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MaybeYou 每日營養搭配測驗</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  body{
+    font-family:'Noto Sans TC',sans-serif;
+    background:linear-gradient(135deg,#fdf6f0 0%,#fce4ec 50%,#f3e5f5 100%);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:20px;
+  }
+
+  .quiz-container{max-width:480px;width:100%;margin:20px auto}
+
+  /* ─── Landing ─── */
+  .landing{
+    text-align:center;
+    background:white;
+    border-radius:24px;
+    padding:40px 32px 48px;
+    box-shadow:0 8px 40px rgba(0,0,0,.08);
+  }
+
+  /* ─── Gears ─── */
+  .gear-section{
+    position:relative;
+    width:200px;height:160px;
+    margin:0 auto 24px;
+  }
+  .gear{position:absolute;border-radius:50%}
+  .gear-svg{width:100%;height:100%}
+
+  .gear-lg{width:100px;height:100px;top:10px;left:16px;animation:spinCW 6s linear infinite}
+  .gear-md{width:70px;height:70px;top:50px;right:20px;animation:spinCCW 4.2s linear infinite}
+  .gear-sm{width:50px;height:50px;top:0;right:40px;animation:spinCW 3s linear infinite}
+
+  @keyframes spinCW{to{transform:rotate(360deg)}}
+  @keyframes spinCCW{to{transform:rotate(-360deg)}}
+
+  .landing:hover .gear-lg{animation-duration:2s}
+  .landing:hover .gear-md{animation-duration:1.4s}
+  .landing:hover .gear-sm{animation-duration:1s}
+
+  .gear-label{
+    position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
+    font-size:12px;color:#bbb;white-space:nowrap;letter-spacing:2px;
+  }
+
+  .landing h1{font-size:26px;font-weight:700;color:#333;margin-bottom:8px}
+  .landing .subtitle{font-size:15px;color:#888;margin-bottom:28px;line-height:1.6}
+  .tag-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:32px}
+  .tag{background:#fef0f5;color:#d4618c;font-size:13px;padding:6px 14px;border-radius:20px;font-weight:500}
+
+  .btn-start{
+    background:linear-gradient(135deg,#e8789a,#c06cd4);
+    color:white;border:none;padding:16px 48px;font-size:18px;font-weight:600;
+    border-radius:50px;cursor:pointer;transition:all .3s;font-family:inherit;letter-spacing:1px;
+  }
+  .btn-start:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(192,108,212,.4)}
+  .landing .note{margin-top:20px;font-size:13px;color:#aaa}
+
+  /* ─── Progress ─── */
+  .progress-wrapper{margin-bottom:20px}
+  .progress-bar-bg{height:6px;background:#e8e0f0;border-radius:3px;overflow:hidden}
+  .progress-bar-fill{height:100%;background:linear-gradient(90deg,#e8789a,#c06cd4);border-radius:3px;transition:width .4s ease}
+  .progress-text{text-align:right;font-size:13px;color:#999;margin-top:6px}
+
+  /* ─── Question ─── */
+  .question-card{
+    background:white;border-radius:24px;padding:36px 28px 28px;
+    box-shadow:0 8px 40px rgba(0,0,0,.08);animation:fadeIn .4s ease;
+  }
+  @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .q-number{
+    display:inline-block;background:linear-gradient(135deg,#e8789a,#c06cd4);
+    color:white;font-size:13px;font-weight:700;padding:4px 14px;border-radius:20px;margin-bottom:16px;
+  }
+  .q-title{font-size:20px;font-weight:700;color:#333;margin-bottom:24px;line-height:1.5}
+  .options{display:flex;flex-direction:column;gap:12px}
+
+  .option-btn{
+    display:flex;align-items:center;gap:14px;
+    background:#fafafa;border:2px solid #eee;border-radius:16px;padding:16px 20px;
+    font-size:15px;color:#444;cursor:pointer;transition:all .25s;
+    text-align:left;font-family:inherit;line-height:1.5;
+  }
+  .option-btn:hover{border-color:#d4a0e8;background:#fdf5ff}
+  .option-btn.selected{
+    border-color:#c06cd4;
+    background:linear-gradient(135deg,#fdf5ff,#fef0f5);
+    color:#7b2d8e;font-weight:500;
+  }
+  .option-icon{font-size:24px;flex-shrink:0;width:36px;text-align:center}
+
+  .nav-row{display:flex;justify-content:space-between;margin-top:24px;gap:12px}
+  .btn-back{
+    flex:1;background:#f5f0f8;color:#999;border:none;padding:14px;
+    font-size:15px;font-weight:500;border-radius:14px;cursor:pointer;font-family:inherit;transition:all .2s;
+  }
+  .btn-back:hover{background:#ece4f2;color:#666}
+  .btn-next{
+    flex:2;background:linear-gradient(135deg,#e8789a,#c06cd4);
+    color:white;border:none;padding:14px;font-size:16px;font-weight:600;
+    border-radius:14px;cursor:pointer;font-family:inherit;transition:all .3s;
+    opacity:.4;pointer-events:none;
+  }
+  .btn-next.active{opacity:1;pointer-events:auto}
+  .btn-next.active:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(192,108,212,.3)}
+
+  /* ─── Loading ─── */
+  .loading-card{
+    background:white;border-radius:24px;padding:60px 32px;
+    box-shadow:0 8px 40px rgba(0,0,0,.08);text-align:center;animation:fadeIn .4s ease;
+  }
+  .loading-gears{position:relative;width:160px;height:130px;margin:0 auto 32px}
+  .loading-gears .gear-lg{animation-duration:.8s;top:8px;left:8px}
+  .loading-gears .gear-md{animation-duration:.56s;top:40px;right:12px}
+  .loading-gears .gear-sm{animation-duration:.4s;top:-2px;right:30px}
+  .loading-text{font-size:18px;font-weight:600;color:#7b2d8e;margin-bottom:8px}
+  .loading-sub{font-size:14px;color:#aaa}
+  .loading-dots::after{content:'';animation:dots 1.5s steps(4,end) infinite}
+  @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+
+  /* ─── Result ─── */
+  .result-card{
+    background:white;border-radius:24px;padding:40px 28px;
+    box-shadow:0 8px 40px rgba(0,0,0,.08);text-align:center;animation:fadeIn .5s ease;
+  }
+  .result-badge{
+    display:inline-block;background:linear-gradient(135deg,#e8789a,#c06cd4);
+    color:white;font-size:14px;font-weight:600;padding:6px 20px;border-radius:20px;margin-bottom:20px;
+  }
+  .result-title{font-size:28px;font-weight:700;color:#333;margin-bottom:8px}
+  .result-code{font-size:15px;color:#aaa;margin-bottom:28px}
+  .result-desc{
+    font-size:15px;color:#666;line-height:1.8;margin-bottom:28px;text-align:left;
+    background:#fdf8ff;padding:20px;border-radius:16px;border-left:4px solid #c06cd4;
+  }
+
+  .combo-section{margin-bottom:28px}
+  .combo-label{font-size:14px;color:#999;margin-bottom:12px;font-weight:500}
+  .combo-pills{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:8px 16px;border-radius:24px;font-size:14px;font-weight:600;color:white;
+  }
+  .pill-red{background:#e74c3c}.pill-orange{background:#f39c12}
+  .pill-yellow{background:#f1c40f;color:#333}.pill-green{background:#27ae60}
+  .pill-blue{background:#3498db}.pill-indigo{background:#6c5ce7}
+  .pill-purple{background:#8e44ad}.pill-coffee{background:#795548}
+  .pill-rice{background:#7e57c2}.pill-cocoa{background:#5d4037}
+
+  .pill .pill-count{
+    background:rgba(255,255,255,.3);width:22px;height:22px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:12px;
+  }
+
+  .suitable-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:28px}
+  .suitable-tag{background:#fef0f5;color:#d4618c;padding:6px 14px;border-radius:20px;font-size:13px}
+
+  .btn-restart{
+    background:#f5f0f8;color:#7b2d8e;border:none;padding:14px 40px;
+    font-size:15px;font-weight:600;border-radius:50px;cursor:pointer;font-family:inherit;
+    transition:all .3s;margin-top:8px;
+  }
+  .btn-restart:hover{background:#ece4f2}
+
+  .btn-cta{
+    background:linear-gradient(135deg,#e8789a,#c06cd4);
+    color:white;border:none;padding:16px 40px;font-size:16px;font-weight:600;
+    border-radius:50px;cursor:pointer;font-family:inherit;transition:all .3s;
+    margin-bottom:12px;display:inline-block;
+  }
+  .btn-cta:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(192,108,212,.4)}
+
+  .toast{
+    position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);
+    background:#e74c3c;color:white;padding:14px 28px;border-radius:12px;
+    font-size:14px;transition:transform .3s ease;z-index:999;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="quiz-container" id="app">
+
+  <!-- ═══ Landing ═══ -->
+  <div class="landing" id="page-landing">
+    <div class="gear-section">
+      <div class="gear gear-lg">
+        <svg class="gear-svg" viewBox="0 0 100 100">
+          <path d="M50 10 L54 10 L56 2 L60 2 L62 10 L66 12 L72 6 L76 8 L74 16 L78 20 L86 18 L88 22 L80 26 L82 32 L90 34 L90 38 L82 40 L82 46 L90 50 L88 54 L80 52 L78 58 L84 64 L80 68 L74 62 L68 66 L72 74 L68 76 L62 70 L58 72 L58 80 L54 80 L52 72 L46 72 L44 80 L40 80 L40 72 L34 70 L30 76 L26 74 L30 66 L24 62 L18 68 L16 64 L22 58 L18 52 L10 54 L10 50 L18 46 L18 40 L10 38 L10 34 L18 32 L20 26 L12 22 L14 18 L22 20 L26 16 L24 8 L28 6 L34 12 L38 10 L38 2 L42 2 L44 10Z" fill="#c06cd4" opacity=".9"/>
+          <circle cx="50" cy="50" r="18" fill="white"/><circle cx="50" cy="50" r="12" fill="#f3e5f5"/><circle cx="50" cy="50" r="5" fill="#c06cd4" opacity=".3"/>
+        </svg>
+      </div>
+      <div class="gear gear-md">
+        <svg class="gear-svg" viewBox="0 0 100 100">
+          <path d="M50 12 L55 12 L57 4 L63 4 L65 12 L70 15 L77 8 L82 12 L76 20 L80 26 L88 26 L89 32 L81 34 L82 40 L90 44 L87 50 L80 48 L77 54 L82 62 L78 66 L72 60 L66 64 L68 72 L62 74 L58 66 L52 68 L52 76 L46 76 L44 68 L38 66 L34 74 L28 72 L32 64 L26 60 L20 66 L16 62 L22 54 L18 48 L10 50 L8 44 L16 40 L16 34 L8 32 L10 26 L18 26 L22 20 L16 12 L22 8 L28 15 L34 12 L34 4 L40 4 L42 12Z" fill="#e8789a" opacity=".9"/>
+          <circle cx="50" cy="50" r="16" fill="white"/><circle cx="50" cy="50" r="10" fill="#fce4ec"/><circle cx="50" cy="50" r="4" fill="#e8789a" opacity=".3"/>
+        </svg>
+      </div>
+      <div class="gear gear-sm">
+        <svg class="gear-svg" viewBox="0 0 100 100">
+          <path d="M50 14 L56 14 L59 4 L66 6 L65 16 L72 20 L80 14 L84 20 L76 28 L78 36 L88 38 L88 46 L78 46 L76 54 L84 62 L78 68 L72 60 L64 64 L66 74 L58 76 L56 66 L48 66 L44 76 L36 74 L40 64 L32 60 L24 68 L18 62 L28 54 L24 46 L14 46 L14 38 L24 36 L26 28 L18 20 L24 14 L32 20 L38 16 L36 6 L44 4 L44 14Z" fill="#f39c12" opacity=".9"/>
+          <circle cx="50" cy="50" r="14" fill="white"/><circle cx="50" cy="50" r="8" fill="#fff8e1"/><circle cx="50" cy="50" r="3" fill="#f39c12" opacity=".3"/>
+        </svg>
+      </div>
+      <span class="gear-label">ANALYZING ENGINE</span>
+    </div>
+
+    <h1>找到專屬你的每日營養搭配</h1>
+    <p class="subtitle">回答 8 個簡單問題<br>為你量身推薦最適合的燈泡菌 + 馬甲光纖飲組合</p>
+    <div class="tag-row">
+      <span class="tag">體態管理</span>
+      <span class="tag">腸道保健</span>
+      <span class="tag">美容養顏</span>
+      <span class="tag">精神專注</span>
+      <span class="tag">舒壓好眠</span>
+    </div>
+    <button class="btn-start" onclick="startQuiz()">開始測驗</button>
+    <p class="note">約 1 分鐘即可完成</p>
+  </div>
+
+  <!-- ═══ Quiz ═══ -->
+  <div class="hidden" id="page-quiz">
+    <div class="progress-wrapper">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+      <div class="progress-text" id="progress-text"></div>
+    </div>
+    <div class="question-card" id="question-card"></div>
+  </div>
+
+  <!-- ═══ Loading ═══ -->
+  <div class="hidden" id="page-loading">
+    <div class="loading-card">
+      <div class="loading-gears">
+        <div class="gear gear-lg">
+          <svg class="gear-svg" viewBox="0 0 100 100"><path d="M50 10 L54 10 L56 2 L60 2 L62 10 L66 12 L72 6 L76 8 L74 16 L78 20 L86 18 L88 22 L80 26 L82 32 L90 34 L90 38 L82 40 L82 46 L90 50 L88 54 L80 52 L78 58 L84 64 L80 68 L74 62 L68 66 L72 74 L68 76 L62 70 L58 72 L58 80 L54 80 L52 72 L46 72 L44 80 L40 80 L40 72 L34 70 L30 76 L26 74 L30 66 L24 62 L18 68 L16 64 L22 58 L18 52 L10 54 L10 50 L18 46 L18 40 L10 38 L10 34 L18 32 L20 26 L12 22 L14 18 L22 20 L26 16 L24 8 L28 6 L34 12 L38 10 L38 2 L42 2 L44 10Z" fill="#c06cd4" opacity=".9"/><circle cx="50" cy="50" r="18" fill="white"/><circle cx="50" cy="50" r="12" fill="#f3e5f5"/></svg>
+        </div>
+        <div class="gear gear-md">
+          <svg class="gear-svg" viewBox="0 0 100 100"><path d="M50 12 L55 12 L57 4 L63 4 L65 12 L70 15 L77 8 L82 12 L76 20 L80 26 L88 26 L89 32 L81 34 L82 40 L90 44 L87 50 L80 48 L77 54 L82 62 L78 66 L72 60 L66 64 L68 72 L62 74 L58 66 L52 68 L52 76 L46 76 L44 68 L38 66 L34 74 L28 72 L32 64 L26 60 L20 66 L16 62 L22 54 L18 48 L10 50 L8 44 L16 40 L16 34 L8 32 L10 26 L18 26 L22 20 L16 12 L22 8 L28 15 L34 12 L34 4 L40 4 L42 12Z" fill="#e8789a" opacity=".9"/><circle cx="50" cy="50" r="16" fill="white"/><circle cx="50" cy="50" r="10" fill="#fce4ec"/></svg>
+        </div>
+        <div class="gear gear-sm">
+          <svg class="gear-svg" viewBox="0 0 100 100"><path d="M50 14 L56 14 L59 4 L66 6 L65 16 L72 20 L80 14 L84 20 L76 28 L78 36 L88 38 L88 46 L78 46 L76 54 L84 62 L78 68 L72 60 L64 64 L66 74 L58 76 L56 66 L48 66 L44 76 L36 74 L40 64 L32 60 L24 68 L18 62 L28 54 L24 46 L14 46 L14 38 L24 36 L26 28 L18 20 L24 14 L32 20 L38 16 L36 6 L44 4 L44 14Z" fill="#f39c12" opacity=".9"/><circle cx="50" cy="50" r="14" fill="white"/><circle cx="50" cy="50" r="8" fill="#fff8e1"/></svg>
+        </div>
+      </div>
+      <p class="loading-text">正在為你分析最佳搭配<span class="loading-dots"></span></p>
+      <p class="loading-sub">齒輪運轉中，請稍候</p>
+    </div>
+  </div>
+
+  <!-- ═══ Result ═══ -->
+  <div class="hidden" id="page-result"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ╔══════════════════════════════════════════╗
+// ║  Google Sheets URL - 部署後貼上你的網址   ║
+// ╚══════════════════════════════════════════╝
+var GOOGLE_SHEET_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+
+var questions = [
+  { id:'gender', title:'你的性別是？', options:[
+    {icon:'\u{1F468}',text:'男性',value:'male'},
+    {icon:'\u{1F469}',text:'女性',value:'female'}
+  ]},
+  { id:'age', title:'你的年齡層？', options:[
+    {icon:'\u{1F4DA}',text:'18 歲以下（學生／考生）',value:'teen'},
+    {icon:'\u{1F4BC}',text:'19 – 35 歲（青壯年）',value:'young'},
+    {icon:'\u{1F3E0}',text:'36 – 55 歲（熟齡）',value:'middle'},
+    {icon:'\u{1F33F}',text:'55 歲以上（銀髮族）',value:'senior'}
+  ]},
+  { id:'goal', title:'你最在意的健康目標是？', options:[
+    {icon:'\u{1F525}',text:'想瘦身／控制體態',value:'slim'},
+    {icon:'\u{1FAE7}',text:'改善消化、排便順暢',value:'digest'},
+    {icon:'\u{26A1}',text:'提升精神與專注力',value:'energy'},
+    {icon:'\u{1F319}',text:'改善睡眠品質、舒壓',value:'sleep'},
+    {icon:'\u{2728}',text:'養顏美容、好氣色',value:'beauty'},
+    {icon:'\u{1F4AA}',text:'增強體力與免疫力',value:'immunity'}
+  ]},
+  { id:'diet', title:'你的飲食習慣偏向？', options:[
+    {icon:'\u{1F371}',text:'經常外食，飲食不規律',value:'eating_out'},
+    {icon:'\u{1F35E}',text:'愛吃澱粉、甜食，難以控制',value:'carbs'},
+    {icon:'\u{1F957}',text:'飲食均衡，想加強營養補充',value:'balanced'},
+    {icon:'\u{1F3CB}\u{FE0F}',text:'有在健身，注重蛋白質攝取',value:'fitness'}
+  ]},
+  { id:'gut', title:'你的腸胃狀況如何？', options:[
+    {icon:'\u{1F623}',text:'經常脹氣、消化不良',value:'bloat'},
+    {icon:'\u{1F624}',text:'排便不順暢，容易便秘',value:'constipation'},
+    {icon:'\u{1F630}',text:'腸胃敏感，容易拉肚子',value:'sensitive'},
+    {icon:'\u{1F60A}',text:'還算正常，沒什麼大問題',value:'normal'}
+  ]},
+  { id:'sleep', title:'你的睡眠與壓力狀態？', options:[
+    {icon:'\u{1F989}',text:'經常熬夜，睡眠品質差',value:'poor'},
+    {icon:'\u{1F629}',text:'壓力大，難以放鬆入睡',value:'stressed'},
+    {icon:'\u{1F971}',text:'睡眠還可以，但白天容易疲倦',value:'tired'},
+    {icon:'\u{1F634}',text:'睡眠正常，精神不錯',value:'good'}
+  ]},
+  { id:'skin', title:'你的外在／肌膚困擾？', options:[
+    {icon:'\u{1F311}',text:'膚色暗沉、氣色差',value:'dull'},
+    {icon:'\u{1F486}',text:'保養品吸收差、膚況不穩定',value:'unstable'},
+    {icon:'\u{1FA7A}',text:'女性私密處容易不舒服',value:'intimate'},
+    {icon:'\u{1F44C}',text:'沒有特別困擾',value:'none'}
+  ]},
+  { id:'exercise', title:'你有運動習慣嗎？', options:[
+    {icon:'\u{1F6CB}\u{FE0F}',text:'幾乎不運動',value:'none'},
+    {icon:'\u{1F6B6}',text:'偶爾運動（每週 1-2 次）',value:'light'},
+    {icon:'\u{1F3C3}',text:'規律運動／健身（每週 3 次以上）',value:'regular'},
+    {icon:'\u{1F525}',text:'高強度運動或體力勞動者',value:'intense'}
+  ]}
+];
+
+var results = {
+  D1:{code:'D1',name:'幫助消化道機能',combo:'紅1 綠1 橙1 可2',desc:'針對腸胃不適、消化不良，透過紅色燈泡菌控制飲食搭配綠色調理腸胃，橙色幫助放鬆，加上可可馬甲光纖飲促進腸道好菌，全方位守護你的消化系統。',tags:['腸胃保健','消化不良','排便順暢'],pills:[{c:'red',n:'紅色',q:1},{c:'green',n:'綠色',q:1},{c:'orange',n:'橙色',q:1},{c:'cocoa',n:'可可',q:2}]},
+  D2:{code:'D2',name:'閃電輕盈',combo:'紅2 綠1 米2 咖1',desc:'專為想瘦身的你量身打造！雙倍紅色燈泡菌狙擊多餘熱量，綠色提升代謝力，紫米馬甲光纖飲增加飽足感、減少亂吃，咖啡口味加速燃燒，讓你輕鬆邁向理想體態。',tags:['體態管理','控制食慾','加速代謝'],pills:[{c:'red',n:'紅色',q:2},{c:'green',n:'綠色',q:1},{c:'rice',n:'紫米',q:2},{c:'coffee',n:'咖啡',q:1}]},
+  D3:{code:'D3',name:'促進新陳代謝',combo:'藍1 靛1 黃1 咖1 可1',desc:'藍色提振精神與專注力，靛色強化防護力，黃色鞏固骨骼基底，搭配咖啡與可可雙口味馬甲光纖飲，全面促進新陳代謝，讓身體循環更順暢。',tags:['新陳代謝','精神提振','循環順暢'],pills:[{c:'blue',n:'藍色',q:1},{c:'indigo',n:'靛色',q:1},{c:'yellow',n:'黃色',q:1},{c:'coffee',n:'咖啡',q:1},{c:'cocoa',n:'可可',q:1}]},
+  D4:{code:'D4',name:'身體循環不卡卡',combo:'紅1 綠1 橙1 米2',desc:'紅色幫助控制飲食、綠色調理腸胃、橙色舒緩壓力助好眠，加上紫米馬甲光纖飲補充蛋白質維持體力，讓外食族也能維持良好的身體循環。',tags:['外食族','腸胃調理','體態維持'],pills:[{c:'red',n:'紅色',q:1},{c:'green',n:'綠色',q:1},{c:'orange',n:'橙色',q:1},{c:'rice',n:'紫米',q:2}]},
+  D5:{code:'D5',name:'活力好氣色',combo:'藍1 綠1 橙1 米2',desc:'藍色提振精神、綠色增強抵抗力、橙色提升睡眠品質，搭配紫米馬甲光纖飲維持好氣色與活力，從內而外散發自然光采。',tags:['好氣色','活力充沛','由內而外'],pills:[{c:'blue',n:'藍色',q:1},{c:'green',n:'綠色',q:1},{c:'orange',n:'橙色',q:1},{c:'rice',n:'紫米',q:2}]},
+  D6:{code:'D6',name:'日夜煥亮',combo:'紅1 靛1 紫1 米2',desc:'紅色控制飲食維持體態、靛色守護女性私密健康、紫色美白提亮氣色，搭配紫米馬甲光纖飲補充營養，白天亮麗、夜晚修護，24 小時持續煥亮。',tags:['美白提亮','私密保養','全天候'],pills:[{c:'red',n:'紅色',q:1},{c:'indigo',n:'靛色',q:1},{c:'purple',n:'紫色',q:1},{c:'rice',n:'紫米',q:2}]},
+  D7:{code:'D7',name:'小資女調理',combo:'紅1 綠1 橙1 米1',desc:'精打細算的日常保養組合！紅色維持體態、綠色顧好腸胃、橙色幫助舒壓好眠，搭配一杯紫米馬甲光纖飲，簡單四步就能照顧好自己。',tags:['日常保養','高CP值','輕鬆維持'],pills:[{c:'red',n:'紅色',q:1},{c:'green',n:'綠色',q:1},{c:'orange',n:'橙色',q:1},{c:'rice',n:'紫米',q:1}]},
+  D8:{code:'D8',name:'白富美保養',combo:'藍1 靛1 橙1 紫1 咖1',desc:'頂級全方位保養方案！藍色提振精神、靛色私密防護、橙色舒壓好眠、紫色美白提亮，加上咖啡馬甲光纖飲促進代謝，給你從頭到腳的全面呵護。',tags:['全方位','頂級保養','美白抗老'],pills:[{c:'blue',n:'藍色',q:1},{c:'indigo',n:'靛色',q:1},{c:'orange',n:'橙色',q:1},{c:'purple',n:'紫色',q:1},{c:'coffee',n:'咖啡',q:1}]},
+  D9:{code:'D9',name:'精緻男調理',combo:'藍1 橙1 咖1',desc:'專為忙碌男性設計的精簡方案。藍色提振精神、增加專注力，橙色幫助舒壓放鬆，搭配咖啡馬甲光纖飲補充能量，三步搞定每日保養。',tags:['男性保養','專注力','精簡有效'],pills:[{c:'blue',n:'藍色',q:1},{c:'orange',n:'橙色',q:1},{c:'coffee',n:'咖啡',q:1}]},
+  D10:{code:'D10',name:'高富帥保養',combo:'藍1 綠1 橙1 黃1 咖1 可1',desc:'全面型男保養方案！藍色提神專注、綠色增強免疫、橙色助眠舒壓、黃色鞏固骨骼，搭配咖啡與可可雙倍馬甲光纖飲，打造由內而外的強健體魄。',tags:['全面保養','運動族','強健體魄'],pills:[{c:'blue',n:'藍色',q:1},{c:'green',n:'綠色',q:1},{c:'orange',n:'橙色',q:1},{c:'yellow',n:'黃色',q:1},{c:'coffee',n:'咖啡',q:1},{c:'cocoa',n:'可可',q:1}]},
+  D11:{code:'D11',name:'考生調理',combo:'黃1 綠1 橙1 米1 可1',desc:'專為考生設計！黃色鞏固骨骼發展、綠色增強抵抗力、橙色舒壓助好眠，搭配紫米和可可馬甲光纖飲補充體力與營養，讓你讀書有精神、考試更專注。',tags:['考生','專注力','抗壓'],pills:[{c:'yellow',n:'黃色',q:1},{c:'green',n:'綠色',q:1},{c:'orange',n:'橙色',q:1},{c:'rice',n:'紫米',q:1},{c:'cocoa',n:'可可',q:1}]},
+  D12:{code:'D12',name:'孩童成長',combo:'黃1 綠1 橙1 可1',desc:'為成長中的孩子打好基礎！黃色幫助骨骼發展、綠色調整腸胃增進食慾、橙色提升睡眠品質，搭配好喝的可可馬甲光纖飲，健康成長每一天。',tags:['孩童','骨骼發展','成長期'],pills:[{c:'yellow',n:'黃色',q:1},{c:'green',n:'綠色',q:1},{c:'orange',n:'橙色',q:1},{c:'cocoa',n:'可可',q:1}]},
+  D13:{code:'D13',name:'銀髮族保健',combo:'黃1 綠1 橙1 米1',desc:'貼心守護長輩健康！黃色加固骨骼、綠色增強免疫抵抗力、橙色幫助舒壓好眠，搭配紫米馬甲光纖飲補充蛋白質維持肌力，讓每一天都充滿活力。',tags:['銀髮族','骨骼保健','免疫力'],pills:[{c:'yellow',n:'黃色',q:1},{c:'green',n:'綠色',q:1},{c:'orange',n:'橙色',q:1},{c:'rice',n:'紫米',q:1}]},
+  D14:{code:'D14',name:'夫妻生活調理',combo:'靛2 藍2 綠2 咖2 可2',desc:'為夫妻雙方設計的共同保養方案。靛色守護私密健康、藍色提振精神活力、綠色增強體力，搭配咖啡與可可雙口味馬甲光纖飲，讓兩人都維持最佳狀態。',tags:['夫妻保養','私密健康','活力充沛'],pills:[{c:'indigo',n:'靛色',q:2},{c:'blue',n:'藍色',q:2},{c:'green',n:'綠色',q:2},{c:'coffee',n:'咖啡',q:2},{c:'cocoa',n:'可可',q:2}]}
+};
+
+var currentQ = 0;
+var answers = {};
+
+function startQuiz(){
+  document.getElementById('page-landing').classList.add('hidden');
+  document.getElementById('page-quiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  var q = questions[currentQ];
+  var total = questions.length;
+  document.getElementById('progress-fill').style.width = (currentQ/total*100)+'%';
+  document.getElementById('progress-text').textContent = (currentQ+1)+' / '+total;
+
+  var card = document.getElementById('question-card');
+  var sel = answers[q.id]||null;
+
+  var opts = q.options.map(function(o){
+    return '<button class="option-btn '+(sel===o.value?'selected':'')+'" data-qid="'+q.id+'" data-val="'+o.value+'">'+
+      '<span class="option-icon">'+o.icon+'</span><span>'+o.text+'</span></button>';
+  }).join('');
+
+  card.innerHTML =
+    '<span class="q-number">Q'+(currentQ+1)+'</span>'+
+    '<h2 class="q-title">'+q.title+'</h2>'+
+    '<div class="options">'+opts+'</div>'+
+    '<div class="nav-row">'+
+      '<button class="btn-back '+(currentQ===0?'hidden':'')+'" id="btn-back">上一題</button>'+
+      '<button class="btn-next '+(sel?'active':'')+'" id="btn-next">'+(currentQ===total-1?'查看結果':'下一題')+'</button>'+
+    '</div>';
+
+  card.querySelectorAll('.option-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      answers[this.dataset.qid]=this.dataset.val;
+      card.querySelectorAll('.option-btn').forEach(function(b){b.classList.remove('selected')});
+      this.classList.add('selected');
+      document.getElementById('btn-next').classList.add('active');
+    });
+  });
+  document.getElementById('btn-next').addEventListener('click',nextQuestion);
+  var bb=document.getElementById('btn-back');
+  if(bb)bb.addEventListener('click',function(){if(currentQ>0){currentQ--;renderQuestion()}});
+
+  card.style.animation='none';card.offsetHeight;card.style.animation='fadeIn .4s ease';
+}
+
+function nextQuestion(){
+  if(!answers[questions[currentQ].id])return;
+  if(currentQ<questions.length-1){currentQ++;renderQuestion()}
+  else{submitQuiz()}
+}
+
+function calculateResult(){
+  var g=answers.gender,a=answers.age,go=answers.goal,d=answers.diet,gu=answers.gut,s=answers.sleep,sk=answers.skin,e=answers.exercise;
+  if(a==='teen')return(e==='none'||e==='light')?'D11':'D12';
+  if(a==='senior')return'D13';
+  if(g==='female'&&sk==='intimate')return'D14';
+  if(g==='male'){
+    if(go==='immunity'||(go==='energy'&&(e==='regular'||e==='intense')))return'D10';
+    if(go==='slim')return'D2';
+    if(go==='digest')return'D1';
+    return'D9';
+  }
+  if(go==='slim')return d==='carbs'?'D2':'D4';
+  if(go==='digest')return gu==='normal'?'D4':'D1';
+  if(go==='beauty'){
+    if(sk==='dull'||sk==='unstable')return(d==='balanced'||e==='regular'||e==='intense')?'D8':'D6';
+    return'D5';
+  }
+  if(go==='sleep')return sk==='dull'?'D5':'D7';
+  if(go==='energy')return s==='tired'?'D3':'D5';
+  if(go==='immunity'){
+    if(e==='regular'||e==='intense')return'D3';
+    if(gu!=='normal')return'D4';
+    return'D7';
+  }
+  return'D7';
+}
+
+function submitQuiz(){
+  document.getElementById('page-quiz').classList.add('hidden');
+  document.getElementById('page-loading').classList.remove('hidden');
+
+  var code=calculateResult();
+  var r=results[code];
+
+  // Send to Google Sheets
+  var payload={
+    gender:answers.gender,age:answers.age,goal:answers.goal,diet:answers.diet,
+    gut:answers.gut,sleep:answers.sleep,skin:answers.skin,exercise:answers.exercise,
+    result_code:r.code,result_name:r.name
+  };
+
+  if(GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'){
+    fetch(GOOGLE_SHEET_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    }).catch(function(){});
+  }
+
+  // Show result after 1.5s
+  setTimeout(function(){ showResult(r); },1500);
+}
+
+function showResult(r){
+  document.getElementById('page-loading').classList.add('hidden');
+  var page=document.getElementById('page-result');
+  page.classList.remove('hidden');
+
+  var pillsHtml=r.pills.map(function(p){
+    return'<span class="pill pill-'+p.c+'"><span>'+p.n+'</span><span class="pill-count">'+p.q+'</span></span>';
+  }).join('');
+  var tagsHtml=r.tags.map(function(t){return'<span class="suitable-tag">#'+t+'</span>'}).join('');
+
+  page.innerHTML=
+    '<div class="result-card">'+
+      '<span class="result-badge">你的專屬推薦</span>'+
+      '<h2 class="result-title">'+r.name+'</h2>'+
+      '<p class="result-code">'+r.code+' ｜ 每日組合：'+r.combo+'</p>'+
+      '<div class="combo-section"><p class="combo-label">每日搭配內容</p><div class="combo-pills">'+pillsHtml+'</div></div>'+
+      '<div class="result-desc">'+r.desc+'</div>'+
+      '<div class="suitable-tags">'+tagsHtml+'</div>'+
+      '<button class="btn-cta" id="btn-cta">立即選購組合</button><br>'+
+      '<button class="btn-restart" id="btn-restart">重新測驗</button>'+
+    '</div>';
+
+  document.getElementById('btn-cta').addEventListener('click',function(){alert('即將為您導向商品頁面！')});
+  document.getElementById('btn-restart').addEventListener('click',function(){
+    currentQ=0;answers={};
+    page.classList.add('hidden');
+    document.getElementById('page-landing').classList.remove('hidden');
+  });
+}
+</script>
+
+</body>
+</html>
