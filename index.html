@@ -191,6 +191,17 @@
   }
   .toast.show{transform:translateX(-50%) translateY(0)}
 
+  /* Admin Gear */
+  .admin-gear{
+    position:fixed;bottom:20px;right:20px;width:44px;height:44px;
+    background:rgba(255,255,255,.85);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 12px rgba(0,0,0,.1);cursor:pointer;
+    transition:all .3s;text-decoration:none;z-index:100;
+  }
+  .admin-gear:hover{background:white;transform:rotate(90deg);box-shadow:0 4px 20px rgba(192,108,212,.3)}
+  .admin-gear svg{width:24px;height:24px}
+
   .hidden{display:none!important}
 </style>
 </head>
@@ -266,6 +277,14 @@
   <!-- ═══ Result ═══ -->
   <div class="hidden" id="page-result"></div>
 </div>
+
+<!-- Admin Gear -->
+<a href="admin.html" class="admin-gear" title="後台管理">
+  <svg viewBox="0 0 100 100">
+    <path d="M50 10 L54 10 L56 2 L60 2 L62 10 L66 12 L72 6 L76 8 L74 16 L78 20 L86 18 L88 22 L80 26 L82 32 L90 34 L90 38 L82 40 L82 46 L90 50 L88 54 L80 52 L78 58 L84 64 L80 68 L74 62 L68 66 L72 74 L68 76 L62 70 L58 72 L58 80 L54 80 L52 72 L46 72 L44 80 L40 80 L40 72 L34 70 L30 76 L26 74 L30 66 L24 62 L18 68 L16 64 L22 58 L18 52 L10 54 L10 50 L18 46 L18 40 L10 38 L10 34 L18 32 L20 26 L12 22 L14 18 L22 20 L26 16 L24 8 L28 6 L34 12 L38 10 L38 2 L42 2 L44 10Z" fill="#c06cd4" opacity=".7"/>
+    <circle cx="50" cy="50" r="18" fill="white"/><circle cx="50" cy="50" r="12" fill="#f3e5f5"/>
+  </svg>
+</a>
 
 <div class="toast" id="toast"></div>
 
