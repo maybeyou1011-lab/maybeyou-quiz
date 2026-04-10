@@ -4,203 +4,229 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MaybeYou 每日營養搭配測驗</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
-
   *{margin:0;padding:0;box-sizing:border-box}
-
   body{
     font-family:'Noto Sans TC',sans-serif;
-    background:linear-gradient(135deg,#fdf6f0 0%,#fce4ec 50%,#f3e5f5 100%);
+    background:#f8f6f3;
     min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    padding:20px;
   }
 
-  .quiz-container{max-width:480px;width:100%;margin:20px auto}
+  .quiz-container{max-width:480px;width:100%;margin:0 auto;min-height:100vh}
 
-  /* ─── Landing ─── */
-  .landing{
-    text-align:center;
-    background:white;
-    border-radius:24px;
-    padding:40px 32px 48px;
-    box-shadow:0 8px 40px rgba(0,0,0,.08);
+  /* ═══════════════════════════════════════
+     LANDING
+     ═══════════════════════════════════════ */
+  .landing{min-height:100vh;display:flex;flex-direction:column}
+
+  /* Hero Image Slider */
+  .hero-slider{
+    position:relative;width:100%;height:320px;overflow:hidden;
+  }
+  .hero-slide{
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    background-size:cover;background-position:center;
+    opacity:0;transition:opacity 1.2s ease;
+  }
+  .hero-slide.active{opacity:1}
+  .hero-slide::after{
+    content:'';position:absolute;bottom:0;left:0;right:0;height:120px;
+    background:linear-gradient(transparent,#f8f6f3);
   }
 
-  /* ─── Gears ─── */
-  .gear-section{
-    position:relative;
-    width:200px;height:160px;
-    margin:0 auto 24px;
+  /* Dots */
+  .hero-dots{
+    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+    display:flex;gap:8px;z-index:2;
   }
-  .gear{position:absolute;border-radius:50%}
-  .gear-svg{width:100%;height:100%}
+  .hero-dot{
+    width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.5);
+    transition:all .3s;
+  }
+  .hero-dot.active{background:white;width:24px;border-radius:4px}
 
-  .gear-lg{width:100px;height:100px;top:10px;left:16px;animation:spinCW 6s linear infinite}
-  .gear-md{width:70px;height:70px;top:50px;right:20px;animation:spinCCW 4.2s linear infinite}
-  .gear-sm{width:50px;height:50px;top:0;right:40px;animation:spinCW 3s linear infinite}
-
-  @keyframes spinCW{to{transform:rotate(360deg)}}
-  @keyframes spinCCW{to{transform:rotate(-360deg)}}
-
-  .landing:hover .gear-lg{animation-duration:2s}
-  .landing:hover .gear-md{animation-duration:1.4s}
-  .landing:hover .gear-sm{animation-duration:1s}
-
-  .gear-label{
-    position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
-    font-size:12px;color:#bbb;white-space:nowrap;letter-spacing:2px;
+  /* Content */
+  .landing-content{
+    flex:1;padding:32px 28px 40px;text-align:center;
+    background:#f8f6f3;
+  }
+  .brand-tag{
+    display:inline-block;font-size:12px;letter-spacing:3px;color:#b8956a;
+    text-transform:uppercase;margin-bottom:16px;font-weight:500;
+  }
+  .landing-content h1{
+    font-size:28px;font-weight:700;color:#2c2c2c;margin-bottom:12px;
+    line-height:1.4;
+  }
+  .landing-content .subtitle{
+    font-size:15px;color:#999;margin-bottom:32px;line-height:1.7;
   }
 
-  .landing h1{font-size:26px;font-weight:700;color:#333;margin-bottom:8px}
-  .landing .subtitle{font-size:15px;color:#888;margin-bottom:28px;line-height:1.6}
-  .tag-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:32px}
-  .tag{background:#fef0f5;color:#d4618c;font-size:13px;padding:6px 14px;border-radius:20px;font-weight:500}
+  .tag-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:36px}
+  .tag{
+    background:white;color:#b8956a;font-size:12px;padding:8px 16px;
+    border-radius:24px;font-weight:500;border:1px solid #efe8de;
+    letter-spacing:.5px;
+  }
 
   .btn-start{
-    background:linear-gradient(135deg,#e8789a,#c06cd4);
-    color:white;border:none;padding:16px 48px;font-size:18px;font-weight:600;
-    border-radius:50px;cursor:pointer;transition:all .3s;font-family:inherit;letter-spacing:1px;
+    background:#2c2c2c;color:white;border:none;
+    padding:18px 56px;font-size:17px;font-weight:600;
+    border-radius:50px;cursor:pointer;transition:all .3s;
+    font-family:inherit;letter-spacing:2px;
   }
-  .btn-start:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(192,108,212,.4)}
-  .landing .note{margin-top:20px;font-size:13px;color:#aaa}
+  .btn-start:hover{background:#444;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+  .landing-content .note{margin-top:20px;font-size:12px;color:#ccc;letter-spacing:1px}
 
-  /* ─── Progress ─── */
-  .progress-wrapper{margin-bottom:20px}
-  .progress-bar-bg{height:6px;background:#e8e0f0;border-radius:3px;overflow:hidden}
-  .progress-bar-fill{height:100%;background:linear-gradient(90deg,#e8789a,#c06cd4);border-radius:3px;transition:width .4s ease}
-  .progress-text{text-align:right;font-size:13px;color:#999;margin-top:6px}
+  /* ═══════════════════════════════════════
+     PROGRESS
+     ═══════════════════════════════════════ */
+  .progress-wrapper{padding:20px 20px 0}
+  .progress-bar-bg{height:4px;background:#e8e4de;border-radius:2px;overflow:hidden}
+  .progress-bar-fill{height:100%;background:#b8956a;border-radius:2px;transition:width .4s ease}
+  .progress-text{text-align:right;font-size:12px;color:#bbb;margin-top:8px;letter-spacing:1px}
 
-  /* ─── Question ─── */
+  /* ═══════════════════════════════════════
+     QUESTION CARD
+     ═══════════════════════════════════════ */
   .question-card{
-    background:white;border-radius:24px;padding:36px 28px 28px;
-    box-shadow:0 8px 40px rgba(0,0,0,.08);animation:fadeIn .4s ease;
+    background:white;border-radius:24px;padding:36px 24px 28px;
+    margin:16px 20px;box-shadow:0 4px 20px rgba(0,0,0,.04);
+    animation:fadeIn .4s ease;
   }
   @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
   .q-number{
-    display:inline-block;background:linear-gradient(135deg,#e8789a,#c06cd4);
-    color:white;font-size:13px;font-weight:700;padding:4px 14px;border-radius:20px;margin-bottom:16px;
+    display:inline-block;background:#2c2c2c;color:white;
+    font-size:11px;font-weight:700;padding:4px 14px;
+    border-radius:20px;margin-bottom:16px;letter-spacing:1px;
   }
-  .q-title{font-size:20px;font-weight:700;color:#333;margin-bottom:24px;line-height:1.5}
-  .options{display:flex;flex-direction:column;gap:12px}
+  .q-title{font-size:20px;font-weight:700;color:#2c2c2c;margin-bottom:24px;line-height:1.5}
+  .options{display:flex;flex-direction:column;gap:10px}
 
   .option-btn{
     display:flex;align-items:center;gap:14px;
-    background:#fafafa;border:2px solid #eee;border-radius:16px;padding:16px 20px;
-    font-size:15px;color:#444;cursor:pointer;transition:all .25s;
-    text-align:left;font-family:inherit;line-height:1.5;
+    background:#fafaf8;border:2px solid #f0ece6;border-radius:16px;
+    padding:15px 18px;font-size:15px;color:#555;cursor:pointer;
+    transition:all .25s;text-align:left;font-family:inherit;line-height:1.5;
   }
-  .option-btn:hover{border-color:#d4a0e8;background:#fdf5ff}
+  .option-btn:hover{border-color:#d4c5a9;background:#fdfcf9}
   .option-btn.selected{
-    border-color:#c06cd4;
-    background:linear-gradient(135deg,#fdf5ff,#fef0f5);
-    color:#7b2d8e;font-weight:500;
+    border-color:#b8956a;background:#fdfaf5;color:#6b5a3e;font-weight:500;
   }
-  .option-icon{font-size:24px;flex-shrink:0;width:36px;text-align:center}
+  .option-icon{font-size:22px;flex-shrink:0;width:32px;text-align:center}
 
   .nav-row{display:flex;justify-content:space-between;margin-top:24px;gap:12px}
   .btn-back{
-    flex:1;background:#f5f0f8;color:#999;border:none;padding:14px;
-    font-size:15px;font-weight:500;border-radius:14px;cursor:pointer;font-family:inherit;transition:all .2s;
+    flex:1;background:#f5f3ef;color:#aaa;border:none;padding:14px;
+    font-size:15px;font-weight:500;border-radius:14px;cursor:pointer;
+    font-family:inherit;transition:all .2s;
   }
-  .btn-back:hover{background:#ece4f2;color:#666}
+  .btn-back:hover{background:#ece8e0;color:#888}
   .btn-next{
-    flex:2;background:linear-gradient(135deg,#e8789a,#c06cd4);
-    color:white;border:none;padding:14px;font-size:16px;font-weight:600;
-    border-radius:14px;cursor:pointer;font-family:inherit;transition:all .3s;
-    opacity:.4;pointer-events:none;
+    flex:2;background:#2c2c2c;color:white;border:none;padding:14px;
+    font-size:16px;font-weight:600;border-radius:14px;cursor:pointer;
+    font-family:inherit;transition:all .3s;opacity:.3;pointer-events:none;
+    letter-spacing:1px;
   }
   .btn-next.active{opacity:1;pointer-events:auto}
-  .btn-next.active:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(192,108,212,.3)}
+  .btn-next.active:hover{background:#444;transform:translateY(-1px)}
 
-  /* ─── Loading ─── */
+  /* ═══════════════════════════════════════
+     LOADING
+     ═══════════════════════════════════════ */
   .loading-card{
-    background:white;border-radius:24px;padding:60px 32px;
-    box-shadow:0 8px 40px rgba(0,0,0,.08);text-align:center;animation:fadeIn .4s ease;
+    background:white;border-radius:24px;padding:60px 32px;margin:20px;
+    box-shadow:0 4px 20px rgba(0,0,0,.04);text-align:center;animation:fadeIn .4s ease;
   }
-  .loading-gears{position:relative;width:160px;height:130px;margin:0 auto 32px}
-  .loading-gears .gear-lg{animation-duration:.8s;top:8px;left:8px}
-  .loading-gears .gear-md{animation-duration:.56s;top:40px;right:12px}
-  .loading-gears .gear-sm{animation-duration:.4s;top:-2px;right:30px}
-  .loading-text{font-size:18px;font-weight:600;color:#7b2d8e;margin-bottom:8px}
-  .loading-sub{font-size:14px;color:#aaa}
-  .loading-dots::after{content:'';animation:dots 1.5s steps(4,end) infinite}
-  @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+  .loading-spinner{
+    width:60px;height:60px;border:4px solid #f0ece6;border-top-color:#b8956a;
+    border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 28px;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-text{font-size:18px;font-weight:600;color:#2c2c2c;margin-bottom:8px}
+  .loading-sub{font-size:14px;color:#bbb}
 
-  /* ─── Result ─── */
+  /* ═══════════════════════════════════════
+     RESULT
+     ═══════════════════════════════════════ */
   .result-card{
-    background:white;border-radius:24px;padding:40px 28px;
-    box-shadow:0 8px 40px rgba(0,0,0,.08);text-align:center;animation:fadeIn .5s ease;
+    background:white;border-radius:24px;padding:40px 24px;margin:20px;
+    box-shadow:0 4px 20px rgba(0,0,0,.04);text-align:center;animation:fadeIn .5s ease;
   }
   .result-badge{
-    display:inline-block;background:linear-gradient(135deg,#e8789a,#c06cd4);
-    color:white;font-size:14px;font-weight:600;padding:6px 20px;border-radius:20px;margin-bottom:20px;
+    display:inline-block;background:#2c2c2c;color:white;
+    font-size:12px;font-weight:600;padding:6px 20px;
+    border-radius:20px;margin-bottom:20px;letter-spacing:2px;
   }
-  .result-title{font-size:28px;font-weight:700;color:#333;margin-bottom:8px}
-  .result-code{font-size:15px;color:#aaa;margin-bottom:28px}
+  .result-title{font-size:28px;font-weight:700;color:#2c2c2c;margin-bottom:8px}
+  .result-code{font-size:14px;color:#bbb;margin-bottom:28px;letter-spacing:1px}
   .result-desc{
     font-size:15px;color:#666;line-height:1.8;margin-bottom:28px;text-align:left;
-    background:#fdf8ff;padding:20px;border-radius:16px;border-left:4px solid #c06cd4;
+    background:#fdfaf5;padding:20px;border-radius:16px;border-left:4px solid #b8956a;
   }
 
   .combo-section{margin-bottom:28px}
-  .combo-label{font-size:14px;color:#999;margin-bottom:12px;font-weight:500}
+  .combo-label{font-size:13px;color:#bbb;margin-bottom:12px;font-weight:500;letter-spacing:1px}
   .combo-pills{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
 
   .pill{
     display:inline-flex;align-items:center;gap:6px;
-    padding:8px 16px;border-radius:24px;font-size:14px;font-weight:600;color:white;
+    padding:8px 16px;border-radius:24px;font-size:13px;font-weight:600;color:white;
   }
-  .pill-red{background:#e74c3c}.pill-orange{background:#f39c12}
-  .pill-yellow{background:#f1c40f;color:#333}.pill-green{background:#27ae60}
-  .pill-blue{background:#3498db}.pill-indigo{background:#6c5ce7}
-  .pill-purple{background:#8e44ad}.pill-coffee{background:#795548}
-  .pill-rice{background:#7e57c2}.pill-cocoa{background:#5d4037}
+  .pill-red{background:#e05252}.pill-orange{background:#e8a040}
+  .pill-yellow{background:#e8d040;color:#555}.pill-green{background:#4caf7a}
+  .pill-blue{background:#4a90d9}.pill-indigo{background:#7c6dd8}
+  .pill-purple{background:#9c5bb5}.pill-coffee{background:#8d6e55}
+  .pill-rice{background:#8b6fc0}.pill-cocoa{background:#6d5243}
 
   .pill .pill-count{
-    background:rgba(255,255,255,.3);width:22px;height:22px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;font-size:12px;
+    background:rgba(255,255,255,.25);width:20px;height:20px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:11px;
   }
 
   .suitable-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:28px}
-  .suitable-tag{background:#fef0f5;color:#d4618c;padding:6px 14px;border-radius:20px;font-size:13px}
+  .suitable-tag{background:#fdfaf5;color:#b8956a;padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid #efe8de}
 
   .btn-restart{
-    background:#f5f0f8;color:#7b2d8e;border:none;padding:14px 40px;
-    font-size:15px;font-weight:600;border-radius:50px;cursor:pointer;font-family:inherit;
-    transition:all .3s;margin-top:8px;
+    background:#f5f3ef;color:#888;border:none;padding:14px 40px;
+    font-size:14px;font-weight:600;border-radius:50px;cursor:pointer;
+    font-family:inherit;transition:all .3s;margin-top:8px;
   }
-  .btn-restart:hover{background:#ece4f2}
-
+  .btn-restart:hover{background:#ece8e0}
   .btn-cta{
-    background:linear-gradient(135deg,#e8789a,#c06cd4);
-    color:white;border:none;padding:16px 40px;font-size:16px;font-weight:600;
-    border-radius:50px;cursor:pointer;font-family:inherit;transition:all .3s;
-    margin-bottom:12px;display:inline-block;
+    background:#2c2c2c;color:white;border:none;padding:16px 44px;
+    font-size:16px;font-weight:600;border-radius:50px;cursor:pointer;
+    font-family:inherit;transition:all .3s;margin-bottom:12px;display:inline-block;
+    letter-spacing:1px;
   }
-  .btn-cta:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(192,108,212,.4)}
+  .btn-cta:hover{background:#444;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
 
-  .toast{
-    position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);
-    background:#e74c3c;color:white;padding:14px 28px;border-radius:12px;
-    font-size:14px;transition:transform .3s ease;z-index:999;
+  /* Result product image */
+  .result-img{
+    width:100%;border-radius:16px;margin-bottom:24px;
   }
-  .toast.show{transform:translateX(-50%) translateY(0)}
 
   /* Admin Gear */
   .admin-gear{
-    position:fixed;bottom:20px;right:20px;width:44px;height:44px;
-    background:rgba(255,255,255,.85);border-radius:50%;
+    position:fixed;bottom:20px;right:20px;width:40px;height:40px;
+    background:rgba(255,255,255,.9);border-radius:50%;
     display:flex;align-items:center;justify-content:center;
-    box-shadow:0 2px 12px rgba(0,0,0,.1);cursor:pointer;
+    box-shadow:0 2px 12px rgba(0,0,0,.08);cursor:pointer;
     transition:all .3s;text-decoration:none;z-index:100;
+    border:1px solid #efe8de;
   }
-  .admin-gear:hover{background:white;transform:rotate(90deg);box-shadow:0 4px 20px rgba(192,108,212,.3)}
-  .admin-gear svg{width:24px;height:24px}
+  .admin-gear:hover{transform:rotate(90deg);box-shadow:0 4px 20px rgba(0,0,0,.12)}
+  .admin-gear svg{width:20px;height:20px}
+
+  .toast{
+    position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);
+    background:#e05252;color:white;padding:14px 28px;border-radius:12px;
+    font-size:14px;transition:transform .3s ease;z-index:999;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0)}
 
   .hidden{display:none!important}
 </style>
@@ -211,39 +237,31 @@
 
   <!-- ═══ Landing ═══ -->
   <div class="landing" id="page-landing">
-    <div class="gear-section">
-      <div class="gear gear-lg">
-        <svg class="gear-svg" viewBox="0 0 100 100">
-          <path d="M50 10 L54 10 L56 2 L60 2 L62 10 L66 12 L72 6 L76 8 L74 16 L78 20 L86 18 L88 22 L80 26 L82 32 L90 34 L90 38 L82 40 L82 46 L90 50 L88 54 L80 52 L78 58 L84 64 L80 68 L74 62 L68 66 L72 74 L68 76 L62 70 L58 72 L58 80 L54 80 L52 72 L46 72 L44 80 L40 80 L40 72 L34 70 L30 76 L26 74 L30 66 L24 62 L18 68 L16 64 L22 58 L18 52 L10 54 L10 50 L18 46 L18 40 L10 38 L10 34 L18 32 L20 26 L12 22 L14 18 L22 20 L26 16 L24 8 L28 6 L34 12 L38 10 L38 2 L42 2 L44 10Z" fill="#c06cd4" opacity=".9"/>
-          <circle cx="50" cy="50" r="18" fill="white"/><circle cx="50" cy="50" r="12" fill="#f3e5f5"/><circle cx="50" cy="50" r="5" fill="#c06cd4" opacity=".3"/>
-        </svg>
+    <div class="hero-slider">
+      <div class="hero-slide active" style="background-image:url('img/hero-brand.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('img/hero-products.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('img/hero-colors.jpg')"></div>
+      <div class="hero-dots">
+        <div class="hero-dot active"></div>
+        <div class="hero-dot"></div>
+        <div class="hero-dot"></div>
       </div>
-      <div class="gear gear-md">
-        <svg class="gear-svg" viewBox="0 0 100 100">
-          <path d="M50 12 L55 12 L57 4 L63 4 L65 12 L70 15 L77 8 L82 12 L76 20 L80 26 L88 26 L89 32 L81 34 L82 40 L90 44 L87 50 L80 48 L77 54 L82 62 L78 66 L72 60 L66 64 L68 72 L62 74 L58 66 L52 68 L52 76 L46 76 L44 68 L38 66 L34 74 L28 72 L32 64 L26 60 L20 66 L16 62 L22 54 L18 48 L10 50 L8 44 L16 40 L16 34 L8 32 L10 26 L18 26 L22 20 L16 12 L22 8 L28 15 L34 12 L34 4 L40 4 L42 12Z" fill="#e8789a" opacity=".9"/>
-          <circle cx="50" cy="50" r="16" fill="white"/><circle cx="50" cy="50" r="10" fill="#fce4ec"/><circle cx="50" cy="50" r="4" fill="#e8789a" opacity=".3"/>
-        </svg>
-      </div>
-      <div class="gear gear-sm">
-        <svg class="gear-svg" viewBox="0 0 100 100">
-          <path d="M50 14 L56 14 L59 4 L66 6 L65 16 L72 20 L80 14 L84 20 L76 28 L78 36 L88 38 L88 46 L78 46 L76 54 L84 62 L78 68 L72 60 L64 64 L66 74 L58 76 L56 66 L48 66 L44 76 L36 74 L40 64 L32 60 L24 68 L18 62 L28 54 L24 46 L14 46 L14 38 L24 36 L26 28 L18 20 L24 14 L32 20 L38 16 L36 6 L44 4 L44 14Z" fill="#f39c12" opacity=".9"/>
-          <circle cx="50" cy="50" r="14" fill="white"/><circle cx="50" cy="50" r="8" fill="#fff8e1"/><circle cx="50" cy="50" r="3" fill="#f39c12" opacity=".3"/>
-        </svg>
-      </div>
-      <span class="gear-label">ANALYZING ENGINE</span>
     </div>
 
-    <h1>找到專屬你的每日營養搭配</h1>
-    <p class="subtitle">回答 8 個簡單問題<br>為你量身推薦最適合的燈泡菌 + 馬甲光纖飲組合</p>
-    <div class="tag-row">
-      <span class="tag">體態管理</span>
-      <span class="tag">腸道保健</span>
-      <span class="tag">美容養顏</span>
-      <span class="tag">精神專注</span>
-      <span class="tag">舒壓好眠</span>
+    <div class="landing-content">
+      <span class="brand-tag">MAYBEYOU</span>
+      <h1>找到專屬你的<br>每日營養搭配</h1>
+      <p class="subtitle">回答 8 個簡單問題<br>為你量身推薦最適合的燈泡菌 + 馬甲光纖飲組合</p>
+      <div class="tag-row">
+        <span class="tag">體態管理</span>
+        <span class="tag">腸道保健</span>
+        <span class="tag">美容養顏</span>
+        <span class="tag">精神專注</span>
+        <span class="tag">舒壓好眠</span>
+      </div>
+      <button class="btn-start" onclick="startQuiz()">開始測驗</button>
+      <p class="note">約 1 分鐘即可完成</p>
     </div>
-    <button class="btn-start" onclick="startQuiz()">開始測驗</button>
-    <p class="note">約 1 分鐘即可完成</p>
   </div>
 
   <!-- ═══ Quiz ═══ -->
@@ -258,19 +276,9 @@
   <!-- ═══ Loading ═══ -->
   <div class="hidden" id="page-loading">
     <div class="loading-card">
-      <div class="loading-gears">
-        <div class="gear gear-lg">
-          <svg class="gear-svg" viewBox="0 0 100 100"><path d="M50 10 L54 10 L56 2 L60 2 L62 10 L66 12 L72 6 L76 8 L74 16 L78 20 L86 18 L88 22 L80 26 L82 32 L90 34 L90 38 L82 40 L82 46 L90 50 L88 54 L80 52 L78 58 L84 64 L80 68 L74 62 L68 66 L72 74 L68 76 L62 70 L58 72 L58 80 L54 80 L52 72 L46 72 L44 80 L40 80 L40 72 L34 70 L30 76 L26 74 L30 66 L24 62 L18 68 L16 64 L22 58 L18 52 L10 54 L10 50 L18 46 L18 40 L10 38 L10 34 L18 32 L20 26 L12 22 L14 18 L22 20 L26 16 L24 8 L28 6 L34 12 L38 10 L38 2 L42 2 L44 10Z" fill="#c06cd4" opacity=".9"/><circle cx="50" cy="50" r="18" fill="white"/><circle cx="50" cy="50" r="12" fill="#f3e5f5"/></svg>
-        </div>
-        <div class="gear gear-md">
-          <svg class="gear-svg" viewBox="0 0 100 100"><path d="M50 12 L55 12 L57 4 L63 4 L65 12 L70 15 L77 8 L82 12 L76 20 L80 26 L88 26 L89 32 L81 34 L82 40 L90 44 L87 50 L80 48 L77 54 L82 62 L78 66 L72 60 L66 64 L68 72 L62 74 L58 66 L52 68 L52 76 L46 76 L44 68 L38 66 L34 74 L28 72 L32 64 L26 60 L20 66 L16 62 L22 54 L18 48 L10 50 L8 44 L16 40 L16 34 L8 32 L10 26 L18 26 L22 20 L16 12 L22 8 L28 15 L34 12 L34 4 L40 4 L42 12Z" fill="#e8789a" opacity=".9"/><circle cx="50" cy="50" r="16" fill="white"/><circle cx="50" cy="50" r="10" fill="#fce4ec"/></svg>
-        </div>
-        <div class="gear gear-sm">
-          <svg class="gear-svg" viewBox="0 0 100 100"><path d="M50 14 L56 14 L59 4 L66 6 L65 16 L72 20 L80 14 L84 20 L76 28 L78 36 L88 38 L88 46 L78 46 L76 54 L84 62 L78 68 L72 60 L64 64 L66 74 L58 76 L56 66 L48 66 L44 76 L36 74 L40 64 L32 60 L24 68 L18 62 L28 54 L24 46 L14 46 L14 38 L24 36 L26 28 L18 20 L24 14 L32 20 L38 16 L36 6 L44 4 L44 14Z" fill="#f39c12" opacity=".9"/><circle cx="50" cy="50" r="14" fill="white"/><circle cx="50" cy="50" r="8" fill="#fff8e1"/></svg>
-        </div>
-      </div>
-      <p class="loading-text">正在為你分析最佳搭配<span class="loading-dots"></span></p>
-      <p class="loading-sub">齒輪運轉中，請稍候</p>
+      <div class="loading-spinner"></div>
+      <p class="loading-text">正在為你分析最佳搭配...</p>
+      <p class="loading-sub">根據你的回答計算專屬組合</p>
     </div>
   </div>
 
@@ -280,19 +288,28 @@
 
 <!-- Admin Gear -->
 <a href="admin.html" class="admin-gear" title="後台管理">
-  <svg viewBox="0 0 100 100">
-    <path d="M50 10 L54 10 L56 2 L60 2 L62 10 L66 12 L72 6 L76 8 L74 16 L78 20 L86 18 L88 22 L80 26 L82 32 L90 34 L90 38 L82 40 L82 46 L90 50 L88 54 L80 52 L78 58 L84 64 L80 68 L74 62 L68 66 L72 74 L68 76 L62 70 L58 72 L58 80 L54 80 L52 72 L46 72 L44 80 L40 80 L40 72 L34 70 L30 76 L26 74 L30 66 L24 62 L18 68 L16 64 L22 58 L18 52 L10 54 L10 50 L18 46 L18 40 L10 38 L10 34 L18 32 L20 26 L12 22 L14 18 L22 20 L26 16 L24 8 L28 6 L34 12 L38 10 L38 2 L42 2 L44 10Z" fill="#c06cd4" opacity=".7"/>
-    <circle cx="50" cy="50" r="18" fill="white"/><circle cx="50" cy="50" r="12" fill="#f3e5f5"/>
+  <svg viewBox="0 0 24 24" fill="none" stroke="#b8956a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
   </svg>
 </a>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ╔══════════════════════════════════════════╗
-// ║  Google Sheets URL - 部署後貼上你的網址   ║
-// ╚══════════════════════════════════════════╝
 var GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwKsQhA7jvF1CrrazwsEb_wo2uYVyqmzt_RC4dUah2dSPz2xq4TOl0SUPCgxT_KMAUN/exec';
+
+// Hero slider
+var slideIndex = 0;
+setInterval(function(){
+  var slides = document.querySelectorAll('.hero-slide');
+  var dots = document.querySelectorAll('.hero-dot');
+  if(!slides.length) return;
+  slides[slideIndex].classList.remove('active');
+  dots[slideIndex].classList.remove('active');
+  slideIndex = (slideIndex + 1) % slides.length;
+  slides[slideIndex].classList.add('active');
+  dots[slideIndex].classList.add('active');
+}, 4000);
 
 var questions = [
   { id:'gender', title:'你的性別是？', options:[
@@ -351,7 +368,7 @@ var results = {
   D3:{code:'D3',name:'促進新陳代謝',combo:'藍1 靛1 黃1 咖1 可1',desc:'藍色提振精神與專注力，靛色強化防護力，黃色鞏固骨骼基底，搭配咖啡與可可雙口味馬甲光纖飲，全面促進新陳代謝，讓身體循環更順暢。',tags:['新陳代謝','精神提振','循環順暢'],pills:[{c:'blue',n:'藍色',q:1},{c:'indigo',n:'靛色',q:1},{c:'yellow',n:'黃色',q:1},{c:'coffee',n:'咖啡',q:1},{c:'cocoa',n:'可可',q:1}]},
   D4:{code:'D4',name:'身體循環不卡卡',combo:'紅1 綠1 橙1 米2',desc:'紅色幫助控制飲食、綠色調理腸胃、橙色舒緩壓力助好眠，加上紫米馬甲光纖飲補充蛋白質維持體力，讓外食族也能維持良好的身體循環。',tags:['外食族','腸胃調理','體態維持'],pills:[{c:'red',n:'紅色',q:1},{c:'green',n:'綠色',q:1},{c:'orange',n:'橙色',q:1},{c:'rice',n:'紫米',q:2}]},
   D5:{code:'D5',name:'活力好氣色',combo:'藍1 綠1 橙1 米2',desc:'藍色提振精神、綠色增強抵抗力、橙色提升睡眠品質，搭配紫米馬甲光纖飲維持好氣色與活力，從內而外散發自然光采。',tags:['好氣色','活力充沛','由內而外'],pills:[{c:'blue',n:'藍色',q:1},{c:'green',n:'綠色',q:1},{c:'orange',n:'橙色',q:1},{c:'rice',n:'紫米',q:2}]},
-  D6:{code:'D6',name:'日夜煥亮',combo:'紅1 靛1 紫1 米2',desc:'紅色控制飲食維持體態、靛色守護女性私密健康、紫色美白提亮氣色，搭配紫米馬甲光纖飲補充營養，白天亮麗、夜晚修護，24 小時持續煥亮。',tags:['美白提亮','私密保養','全天候'],pills:[{c:'red',n:'紅色',q:1},{c:'indigo',n:'靛色',q:1},{c:'purple',n:'紫色',q:1},{c:'rice',n:'紫米',q:2}]},
+  D6:{code:'D6',name:'日夜煥亮',combo:'紅1 靛1 紫1 米2',desc:'紅色控制飲食維持體態、靛色守護女性私密健康、紫色美白提亮氣色，搭配紫米馬甲光纖飲補充營養，白天亮麗、夜晚修護，24小時持續煥亮。',tags:['美白提亮','私密保養','全天候'],pills:[{c:'red',n:'紅色',q:1},{c:'indigo',n:'靛色',q:1},{c:'purple',n:'紫色',q:1},{c:'rice',n:'紫米',q:2}]},
   D7:{code:'D7',name:'小資女調理',combo:'紅1 綠1 橙1 米1',desc:'精打細算的日常保養組合！紅色維持體態、綠色顧好腸胃、橙色幫助舒壓好眠，搭配一杯紫米馬甲光纖飲，簡單四步就能照顧好自己。',tags:['日常保養','高CP值','輕鬆維持'],pills:[{c:'red',n:'紅色',q:1},{c:'green',n:'綠色',q:1},{c:'orange',n:'橙色',q:1},{c:'rice',n:'紫米',q:1}]},
   D8:{code:'D8',name:'白富美保養',combo:'藍1 靛1 橙1 紫1 咖1',desc:'頂級全方位保養方案！藍色提振精神、靛色私密防護、橙色舒壓好眠、紫色美白提亮，加上咖啡馬甲光纖飲促進代謝，給你從頭到腳的全面呵護。',tags:['全方位','頂級保養','美白抗老'],pills:[{c:'blue',n:'藍色',q:1},{c:'indigo',n:'靛色',q:1},{c:'orange',n:'橙色',q:1},{c:'purple',n:'紫色',q:1},{c:'coffee',n:'咖啡',q:1}]},
   D9:{code:'D9',name:'精緻男調理',combo:'藍1 橙1 咖1',desc:'專為忙碌男性設計的精簡方案。藍色提振精神、增加專注力，橙色幫助舒壓放鬆，搭配咖啡馬甲光纖飲補充能量，三步搞定每日保養。',tags:['男性保養','專注力','精簡有效'],pills:[{c:'blue',n:'藍色',q:1},{c:'orange',n:'橙色',q:1},{c:'coffee',n:'咖啡',q:1}]},
@@ -362,8 +379,7 @@ var results = {
   D14:{code:'D14',name:'夫妻生活調理',combo:'靛2 藍2 綠2 咖2 可2',desc:'為夫妻雙方設計的共同保養方案。靛色守護私密健康、藍色提振精神活力、綠色增強體力，搭配咖啡與可可雙口味馬甲光纖飲，讓兩人都維持最佳狀態。',tags:['夫妻保養','私密健康','活力充沛'],pills:[{c:'indigo',n:'靛色',q:2},{c:'blue',n:'藍色',q:2},{c:'green',n:'綠色',q:2},{c:'coffee',n:'咖啡',q:2},{c:'cocoa',n:'可可',q:2}]}
 };
 
-var currentQ = 0;
-var answers = {};
+var currentQ=0, answers={};
 
 function startQuiz(){
   document.getElementById('page-landing').classList.add('hidden');
@@ -372,28 +388,18 @@ function startQuiz(){
 }
 
 function renderQuestion(){
-  var q = questions[currentQ];
-  var total = questions.length;
-  document.getElementById('progress-fill').style.width = (currentQ/total*100)+'%';
-  document.getElementById('progress-text').textContent = (currentQ+1)+' / '+total;
-
-  var card = document.getElementById('question-card');
-  var sel = answers[q.id]||null;
-
-  var opts = q.options.map(function(o){
+  var q=questions[currentQ],total=questions.length;
+  document.getElementById('progress-fill').style.width=(currentQ/total*100)+'%';
+  document.getElementById('progress-text').textContent=(currentQ+1)+' / '+total;
+  var card=document.getElementById('question-card'),sel=answers[q.id]||null;
+  var opts=q.options.map(function(o){
     return '<button class="option-btn '+(sel===o.value?'selected':'')+'" data-qid="'+q.id+'" data-val="'+o.value+'">'+
       '<span class="option-icon">'+o.icon+'</span><span>'+o.text+'</span></button>';
   }).join('');
-
-  card.innerHTML =
-    '<span class="q-number">Q'+(currentQ+1)+'</span>'+
-    '<h2 class="q-title">'+q.title+'</h2>'+
-    '<div class="options">'+opts+'</div>'+
-    '<div class="nav-row">'+
-      '<button class="btn-back '+(currentQ===0?'hidden':'')+'" id="btn-back">上一題</button>'+
-      '<button class="btn-next '+(sel?'active':'')+'" id="btn-next">'+(currentQ===total-1?'查看結果':'下一題')+'</button>'+
-    '</div>';
-
+  card.innerHTML='<span class="q-number">Q'+(currentQ+1)+'</span>'+
+    '<h2 class="q-title">'+q.title+'</h2><div class="options">'+opts+'</div>'+
+    '<div class="nav-row"><button class="btn-back '+(currentQ===0?'hidden':'')+'" id="btn-back">上一題</button>'+
+    '<button class="btn-next '+(sel?'active':'')+'" id="btn-next">'+(currentQ===total-1?'查看結果':'下一題')+'</button></div>';
   card.querySelectorAll('.option-btn').forEach(function(btn){
     btn.addEventListener('click',function(){
       answers[this.dataset.qid]=this.dataset.val;
@@ -405,7 +411,6 @@ function renderQuestion(){
   document.getElementById('btn-next').addEventListener('click',nextQuestion);
   var bb=document.getElementById('btn-back');
   if(bb)bb.addEventListener('click',function(){if(currentQ>0){currentQ--;renderQuestion()}});
-
   card.style.animation='none';card.offsetHeight;card.style.animation='fadeIn .4s ease';
 }
 
@@ -422,83 +427,53 @@ function calculateResult(){
   if(g==='female'&&sk==='intimate')return'D14';
   if(g==='male'){
     if(go==='immunity'||(go==='energy'&&(e==='regular'||e==='intense')))return'D10';
-    if(go==='slim')return'D2';
-    if(go==='digest')return'D1';
-    return'D9';
+    if(go==='slim')return'D2';if(go==='digest')return'D1';return'D9';
   }
   if(go==='slim')return d==='carbs'?'D2':'D4';
   if(go==='digest')return gu==='normal'?'D4':'D1';
-  if(go==='beauty'){
-    if(sk==='dull'||sk==='unstable')return(d==='balanced'||e==='regular'||e==='intense')?'D8':'D6';
-    return'D5';
-  }
+  if(go==='beauty'){if(sk==='dull'||sk==='unstable')return(d==='balanced'||e==='regular'||e==='intense')?'D8':'D6';return'D5'}
   if(go==='sleep')return sk==='dull'?'D5':'D7';
   if(go==='energy')return s==='tired'?'D3':'D5';
-  if(go==='immunity'){
-    if(e==='regular'||e==='intense')return'D3';
-    if(gu!=='normal')return'D4';
-    return'D7';
-  }
+  if(go==='immunity'){if(e==='regular'||e==='intense')return'D3';if(gu!=='normal')return'D4';return'D7'}
   return'D7';
 }
 
 function submitQuiz(){
   document.getElementById('page-quiz').classList.add('hidden');
   document.getElementById('page-loading').classList.remove('hidden');
-
-  var code=calculateResult();
-  var r=results[code];
-
-  // Send to Google Sheets
-  var payload={
-    gender:answers.gender,age:answers.age,goal:answers.goal,diet:answers.diet,
+  var code=calculateResult(),r=results[code];
+  var payload={gender:answers.gender,age:answers.age,goal:answers.goal,diet:answers.diet,
     gut:answers.gut,sleep:answers.sleep,skin:answers.skin,exercise:answers.exercise,
-    result_code:r.code,result_name:r.name
-  };
-
-  if(GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'){
-    fetch(GOOGLE_SHEET_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload),
-      redirect:'follow'
-    }).catch(function(){});
+    result_code:r.code,result_name:r.name};
+  if(GOOGLE_SHEET_URL){
+    fetch(GOOGLE_SHEET_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload),redirect:'follow'}).catch(function(){});
   }
-
-  // Show result after 1.5s
-  setTimeout(function(){ showResult(r); },1500);
+  setTimeout(function(){showResult(r)},1800);
 }
 
 function showResult(r){
   document.getElementById('page-loading').classList.add('hidden');
-  var page=document.getElementById('page-result');
-  page.classList.remove('hidden');
-
+  var page=document.getElementById('page-result');page.classList.remove('hidden');
   var pillsHtml=r.pills.map(function(p){
     return'<span class="pill pill-'+p.c+'"><span>'+p.n+'</span><span class="pill-count">'+p.q+'</span></span>';
   }).join('');
   var tagsHtml=r.tags.map(function(t){return'<span class="suitable-tag">#'+t+'</span>'}).join('');
-
-  page.innerHTML=
-    '<div class="result-card">'+
-      '<span class="result-badge">你的專屬推薦</span>'+
-      '<h2 class="result-title">'+r.name+'</h2>'+
-      '<p class="result-code">'+r.code+' ｜ 每日組合：'+r.combo+'</p>'+
-      '<div class="combo-section"><p class="combo-label">每日搭配內容</p><div class="combo-pills">'+pillsHtml+'</div></div>'+
-      '<div class="result-desc">'+r.desc+'</div>'+
-      '<div class="suitable-tags">'+tagsHtml+'</div>'+
-      '<button class="btn-cta" id="btn-cta">立即選購組合</button><br>'+
-      '<button class="btn-restart" id="btn-restart">重新測驗</button>'+
-    '</div>';
-
+  page.innerHTML='<div class="result-card">'+
+    '<img src="img/hero-products.jpg" class="result-img" alt="MaybeYou Products">'+
+    '<span class="result-badge">YOUR DAILY COMBO</span>'+
+    '<h2 class="result-title">'+r.name+'</h2>'+
+    '<p class="result-code">'+r.code+' ｜ '+r.combo+'</p>'+
+    '<div class="combo-section"><p class="combo-label">每日搭配內容</p><div class="combo-pills">'+pillsHtml+'</div></div>'+
+    '<div class="result-desc">'+r.desc+'</div>'+
+    '<div class="suitable-tags">'+tagsHtml+'</div>'+
+    '<button class="btn-cta" id="btn-cta">立即選購組合</button><br>'+
+    '<button class="btn-restart" id="btn-restart">重新測驗</button></div>';
   document.getElementById('btn-cta').addEventListener('click',function(){alert('即將為您導向商品頁面！')});
   document.getElementById('btn-restart').addEventListener('click',function(){
-    currentQ=0;answers={};
-    page.classList.add('hidden');
-    document.getElementById('page-landing').classList.remove('hidden');
+    currentQ=0;answers={};page.classList.add('hidden');document.getElementById('page-landing').classList.remove('hidden');
   });
 }
 </script>
-
 </body>
 </html>
