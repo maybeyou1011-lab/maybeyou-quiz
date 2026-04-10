@@ -1,4 +1,4 @@
-// ═══ 貼到 Google Apps Script 裡面 ═══
+// ═══ 貼到 Google Apps Script 裡面（全部替換）═══
 
 function doPost(e) {
   try {
@@ -43,4 +43,10 @@ function doPost(e) {
       .createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function doGet(e) {
+  return ContentService
+    .createTextOutput('Quiz API is running')
+    .setMimeType(ContentService.MimeType.TEXT);
 }

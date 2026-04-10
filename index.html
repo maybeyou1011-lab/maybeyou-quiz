@@ -438,12 +438,9 @@ function submitQuiz(){
   };
 
   if(GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'){
-    fetch(GOOGLE_SHEET_URL,{
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
-    }).catch(function(){});
+    // Use beacon with blob to send data reliably
+    var blob = new Blob([JSON.stringify(payload)],{type:'text/plain'});
+    navigator.sendBeacon(GOOGLE_SHEET_URL, blob);
   }
 
   // Show result after 1.5s
