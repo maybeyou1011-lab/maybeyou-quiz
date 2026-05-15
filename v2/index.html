@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MaybeYou 燈泡菌調理測驗 v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Noto Sans TC',sans-serif;background:#f0ebe2;min-height:100vh;color:#2c2c2c}
+  .wrap{max-width:480px;width:100%;margin:0 auto;min-height:100vh;position:relative;background:#f8f6f3;box-shadow:0 0 60px rgba(0,0,0,.05)}
+
+  /* 通用 section 小標 */
+  .section-h{display:flex;align-items:center;gap:10px;margin:24px 0 12px;padding:0 4px}
+  .section-h .bar{width:3px;height:14px;background:#b8956a;border-radius:2px}
+  .section-h .t{font-size:12px;letter-spacing:3px;color:#b8956a;font-weight:700}
+  .section-h .t-sub{font-size:11px;color:#bbb;margin-left:auto;letter-spacing:1px}
+
+  /* === Landing === */
+  .landing{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:64px 28px 40px;text-align:center;background:radial-gradient(circle at 50% 30%,#fff3dc 0%,#fdfaf5 35%,#f8f6f3 70%)}
+  .bulb{
+    width:80px;height:80px;margin:0 auto 22px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff,#ffd98a 50%,#e8a040 100%);
+    box-shadow:0 0 0 0 rgba(232,160,64,.55), 0 8px 30px rgba(232,160,64,.25);
+    animation:bulbBreath 2.8s ease-in-out infinite;
+  }
+  @keyframes bulbBreath{
+    0%,100%{box-shadow:0 0 0 0 rgba(232,160,64,.55), 0 8px 30px rgba(232,160,64,.25);transform:scale(1)}
+    50%{box-shadow:0 0 0 18px rgba(232,160,64,0), 0 12px 40px rgba(232,160,64,.35);transform:scale(1.05)}
+  }
+  .brand-tag{display:inline-block;font-size:12px;letter-spacing:3px;color:#b8956a;margin-bottom:14px;font-weight:500}
+  .landing h1{font-size:30px;line-height:1.4;font-weight:700;margin-bottom:14px}
+  .landing h1 em{font-style:normal;color:#b8956a}
+  .landing .sub{font-size:15px;color:#888;line-height:1.8;margin-bottom:30px}
+  .landing .sub b{color:#666;font-weight:500}
+  .tag-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:36px}
+  .tag{background:white;color:#b8956a;font-size:12px;padding:8px 16px;border-radius:24px;border:1px solid #efe8de;letter-spacing:.5px}
+  .btn-primary{background:#2c2c2c;color:white;border:none;padding:18px 56px;font-size:16px;font-weight:600;border-radius:50px;cursor:pointer;font-family:inherit;letter-spacing:2px;transition:transform .15s,box-shadow .25s,background .25s}
+  .btn-primary:hover{background:#444;transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.18)}
+  .btn-primary:active{transform:scale(.97)}
+  .note{margin-top:18px;font-size:12px;color:#bbb;letter-spacing:1px}
+  .landing-foot{margin-top:32px;font-size:12px;color:#bbb}
+  .landing-foot b{color:#b8956a;font-weight:600}
+
+  /* value grid (time + benefit upfront) */
+  .value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 30px;width:100%;max-width:340px;margin-left:auto;margin-right:auto}
+  .value-item{background:white;border-radius:14px;padding:14px 8px;text-align:center;box-shadow:0 4px 14px rgba(184,149,106,.08);border:1px solid #efe8de}
+  .v-num{font-size:24px;font-weight:800;color:#b8956a;letter-spacing:-1px;line-height:1.1}
+  .v-label{font-size:11px;color:#888;margin-top:4px;letter-spacing:1px}
+
+  /* social strip with avatars */
+  .social-strip{margin-top:28px;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .avatars{display:flex;gap:-8px}
+  .avatars .ava{width:32px;height:32px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#2c2c2c;margin-left:-8px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+  .avatars .ava:first-child{margin-left:0}
+  .avatars .more{background:#fdfaf5!important;color:#b8956a!important;font-size:14px}
+  .social-text{font-size:12px;color:#999}
+  .social-text b{color:#b8956a;font-weight:700}
+
+  /* review card */
+  .reviews-strip{margin-top:22px;width:100%}
+  .review-card{background:white;border-radius:14px;padding:16px 18px;border:1px solid #efe8de;text-align:left;box-shadow:0 2px 12px rgba(0,0,0,.03)}
+  .review-card .stars{color:#f5a623;font-size:13px;letter-spacing:2px;margin-bottom:6px}
+  .review-card p{font-size:13px;color:#555;line-height:1.7;margin-bottom:6px}
+  .review-card span{font-size:11px;color:#bbb;letter-spacing:.5px}
+
+  /* mid-funnel review pop */
+  .mid-review{
+    margin:14px 20px 0;background:white;border-radius:16px;padding:14px 16px;
+    border:1px solid #efe8de;box-shadow:0 4px 12px rgba(184,149,106,.06);
+    animation:midReviewIn .5s ease;display:flex;gap:12px;align-items:flex-start;
+  }
+  @keyframes midReviewIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+  .mid-review .mr-ava{width:36px;height:36px;border-radius:50%;background:#ffd98a;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+  .mid-review .mr-body{flex:1}
+  .mid-review .mr-quote{font-size:13px;color:#444;line-height:1.6;margin-bottom:4px}
+  .mid-review .mr-by{font-size:11px;color:#bbb;letter-spacing:.5px}
+  .mid-review .mr-stars{color:#f5a623;font-size:11px;margin-bottom:4px;letter-spacing:1px}
+
+  /* topic interstitial */
+  .topic-pass{
+    position:fixed;inset:0;background:rgba(248,246,243,.95);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:300;opacity:0;pointer-events:none;transition:opacity .35s ease;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;
+  }
+  .topic-pass.show{opacity:1;pointer-events:auto}
+  .topic-pass .tp-icon{font-size:56px;margin-bottom:18px;animation:tpIcon 1.4s ease}
+  @keyframes tpIcon{0%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.15)}100%{transform:scale(1)}}
+  .topic-pass .tp-label{font-size:12px;color:#b8956a;letter-spacing:4px;margin-bottom:8px;font-weight:700}
+  .topic-pass .tp-title{font-size:22px;font-weight:700;color:#2c2c2c;text-align:center;line-height:1.5;padding:0 20px}
+  .topic-pass .tp-sub{font-size:13px;color:#888;margin-top:6px}
+  .topic-pass .tp-skip{
+    position:absolute;top:24px;right:24px;width:36px;height:36px;border-radius:50%;
+    background:white;border:1px solid #efe8de;display:flex;align-items:center;justify-content:center;
+    color:#999;font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.04);
+  }
+  .topic-pass .tp-skip:hover{color:#2c2c2c;background:#fafaf8}
+  .topic-pass .tp-tap{position:absolute;bottom:36px;font-size:11px;color:#bbb;letter-spacing:2px}
+
+  /* sticky bottom CTA on result page */
+  .sticky-cta{
+    position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+    max-width:480px;width:100%;background:white;
+    box-shadow:0 -8px 24px rgba(0,0,0,.08);
+    padding:12px 16px 16px;z-index:60;display:none;
+    border-top:1px solid #efe8de;
+  }
+  .sticky-cta.show{display:flex;gap:12px;align-items:center;animation:slideUp .35s ease}
+  .sticky-cta .price-block{flex:1;text-align:left}
+  .sticky-cta .price-now{font-size:22px;font-weight:800;color:#d4501e;letter-spacing:-.5px;display:block;line-height:1.1}
+  .sticky-cta .price-meta{font-size:11px;color:#888;margin-top:2px}
+  .sticky-cta .price-meta b{color:#4caf7a;font-weight:700}
+  .sticky-cta button{
+    background:#2c2c2c;color:white;border:none;padding:14px 22px;
+    font-size:14px;font-weight:700;border-radius:50px;cursor:pointer;
+    font-family:inherit;letter-spacing:1px;transition:all .25s;
+  }
+  .sticky-cta button:hover{background:#444;transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.15)}
+  .sticky-cta button:active{transform:scale(.97)}
+
+  /* === Progress === */
+  .progress-wrap{padding:20px 20px 0;position:sticky;top:0;background:#f8f6f3;z-index:5}
+  .progress-bg{height:5px;background:#e8e4de;border-radius:3px;overflow:hidden;position:relative}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#b8956a,#d4b87a);border-radius:3px;transition:width .5s cubic-bezier(.5,.05,.2,1);position:relative}
+  .progress-fill::after{content:'';position:absolute;right:-2px;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;background:#ffd98a;box-shadow:0 0 10px rgba(232,160,64,.6)}
+  .progress-text{display:flex;justify-content:space-between;font-size:11px;color:#999;margin-top:8px;letter-spacing:1px}
+  .progress-text b{color:#b8956a;font-weight:700}
+
+  /* 漸進速寫句（取代 chip 列表）*/
+  .sketch{
+    margin:14px 20px 0;background:white;border-radius:20px;padding:16px 20px;
+    box-shadow:0 4px 16px rgba(184,149,106,.08);
+    transition:all .4s ease;
+    border-left:3px solid #b8956a;
+  }
+  .sketch.empty{opacity:0;transform:translateY(-8px);pointer-events:none;padding:0;margin:0 20px;height:0;border:none}
+  .sketch-label{font-size:10px;color:#bbb;letter-spacing:2px;margin-bottom:6px;font-weight:600}
+  .sketch-body{font-size:15px;color:#2c2c2c;line-height:1.6;font-weight:500}
+  .sketch-body .you{color:#b8956a;font-weight:700}
+  .sketch-body span.new{animation:sketchPop .5s ease}
+  @keyframes sketchPop{0%{opacity:0;color:#b8956a;transform:scale(.9)}50%{color:#b8956a}100%{opacity:1;transform:scale(1)}}
+
+  /* 同理過場 banner */
+  .empathy{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);
+    background:#2c2c2c;color:white;padding:18px 32px;border-radius:24px;
+    font-size:15px;opacity:0;pointer-events:none;z-index:200;
+    box-shadow:0 12px 40px rgba(0,0,0,.25);transition:all .4s ease;
+    max-width:80vw;text-align:center;line-height:1.6;
+  }
+  .empathy.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+  /* === Question === */
+  .q-card{background:white;border-radius:24px;padding:32px 22px 24px;margin:16px 20px;box-shadow:0 4px 20px rgba(0,0,0,.04);animation:fadeIn .4s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .q-num{display:inline-block;background:#2c2c2c;color:white;font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;margin-bottom:14px;letter-spacing:1px}
+  .q-title{font-size:20px;font-weight:700;margin-bottom:22px;line-height:1.5}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{
+    display:flex;align-items:center;gap:14px;
+    background:#fafaf8;border:2px solid #f0ece6;border-radius:16px;
+    padding:15px 18px;font-size:15px;color:#555;cursor:pointer;
+    transition:transform .15s,border-color .25s,background .25s,box-shadow .25s;
+    text-align:left;font-family:inherit;line-height:1.5;position:relative;
+  }
+  .opt:hover{border-color:#d4c5a9;background:#fdfcf9;transform:translateX(2px)}
+  .opt:active{transform:scale(.98)}
+  .opt.sel{border-color:#b8956a;background:#fdfaf5;color:#6b5a3e;font-weight:600;box-shadow:0 4px 16px rgba(184,149,106,.15)}
+  .opt.sel::after{content:'✓';position:absolute;right:18px;top:50%;transform:translateY(-50%);color:#b8956a;font-weight:700;font-size:18px;animation:checkPop .3s ease}
+  @keyframes checkPop{0%{opacity:0;transform:translateY(-50%) scale(.5)}100%{opacity:1;transform:translateY(-50%) scale(1)}}
+  .opt-icon{font-size:22px;width:32px;text-align:center;flex-shrink:0}
+
+  .nav-row{display:flex;gap:12px;margin-top:24px}
+  .btn-back{flex:1;background:#f5f3ef;color:#aaa;border:none;padding:14px;font-size:15px;font-weight:500;border-radius:14px;cursor:pointer;font-family:inherit}
+  .btn-back:hover{background:#ece8e0;color:#888}
+  .btn-next{flex:2;background:#2c2c2c;color:white;border:none;padding:14px;font-size:15px;font-weight:600;border-radius:14px;cursor:pointer;font-family:inherit;opacity:.3;pointer-events:none;letter-spacing:1px}
+  .btn-next.on{opacity:1;pointer-events:auto}
+  .btn-next.on:hover{background:#444}
+  .btn-next:active,.btn-cta:active,.btn-back:active{transform:scale(.97)}
+
+  /* === Analyzing（揭曉前個人化分析） === */
+  .analyze{padding:80px 24px;text-align:center;min-height:80vh;display:flex;flex-direction:column;justify-content:center;align-items:center}
+  .analyze-orb{
+    width:120px;height:120px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff,#ffd98a 45%,#e8a040 100%);
+    box-shadow:0 0 60px rgba(232,160,64,.5);
+    animation:bulbBreath 1.8s ease-in-out infinite;margin-bottom:32px;
+  }
+  .analyze-line{font-size:15px;color:#666;line-height:1.7;margin-bottom:10px;min-height:25px;opacity:0;transition:opacity .4s}
+  .analyze-line.show{opacity:1}
+  .analyze-line .key{color:#b8956a;font-weight:600}
+
+  /* === Reveal （3 張卡 ・ 真 3D 翻牌） === */
+  .reveal{padding:36px 20px;text-align:center}
+  .reveal-title{font-size:20px;font-weight:600;color:#2c2c2c;margin-bottom:6px}
+  .reveal-sub{font-size:13px;color:#bbb;margin-bottom:28px;letter-spacing:1px}
+  .reveal-cards{display:flex;flex-direction:column;gap:16px;margin-bottom:28px;perspective:1400px}
+  .reveal-card{
+    min-height:160px;cursor:pointer;position:relative;
+    transform-style:preserve-3d;transition:transform .8s cubic-bezier(.5,.05,.2,1.05);
+  }
+  .reveal-card.tall{min-height:240px}
+  .reveal-card.tall-mid{min-height:250px}
+  .reveal-card:hover .face.front{box-shadow:0 8px 28px rgba(0,0,0,.08)}
+  .reveal-card.locked{opacity:.55;filter:saturate(.5)}
+  .reveal-card.locked .reveal-tap{display:none}
+  .reveal-card.ready .face.front{
+    box-shadow:0 4px 18px rgba(184,149,106,.18);
+    border:1px solid #efe8de;animation:cardReady 2s ease-in-out infinite;
+  }
+  @keyframes cardReady{
+    0%,100%{box-shadow:0 4px 18px rgba(184,149,106,.18)}
+    50%{box-shadow:0 6px 26px rgba(184,149,106,.32)}
+  }
+  .reveal-card .face .icon-circle{
+    width:46px;height:46px;border-radius:50%;
+    background:linear-gradient(135deg,#fff8e8,#fdfaf5);
+    display:flex;align-items:center;justify-content:center;font-size:22px;
+    margin-bottom:12px;border:1px solid #efe8de;
+  }
+  .reveal-card.final .face .icon-circle{
+    background:radial-gradient(circle at 35% 30%,#fff,#ffd98a 50%,#e8a040 100%);
+    border:none;color:white;
+  }
+  .reveal-card .face{
+    position:absolute;top:0;left:0;right:0;bottom:0;
+    background:white;border-radius:20px;padding:22px 22px;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    box-shadow:0 4px 18px rgba(0,0,0,.06);
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .reveal-card .front{position:relative;background:white}
+  .reveal-card .back{
+    transform:rotateY(180deg);
+    background:linear-gradient(135deg,#fff8e8,#fdfaf5);
+    border:1px solid #efe8de;
+  }
+  .reveal-card.open{transform:rotateY(180deg)}
+  .reveal-card .hint{font-size:12px;color:#bbb;margin-bottom:6px;letter-spacing:1px}
+  .reveal-card .q-text{font-size:16px;color:#2c2c2c;font-weight:500;line-height:1.6}
+  .reveal-card .answer-label{font-size:11px;color:#b8956a;letter-spacing:3px;margin-bottom:10px;font-weight:600}
+  .reveal-card .answer-main{font-size:22px;color:#2c2c2c;font-weight:700;line-height:1.4}
+  .reveal-card .small{font-size:13px;color:#888;margin-top:8px;line-height:1.6}
+  /* 散文與痛點列表（卡 1、卡 2 的背面） */
+  .reveal-prose{font-size:14px;color:#3a2f1f;line-height:1.9;text-align:left}
+  .reveal-prose b{color:#b8956a}
+  .reveal-pains{display:flex;flex-direction:column;gap:8px;text-align:left}
+  .reveal-pain{display:flex;gap:12px;align-items:center;background:white;padding:10px 12px;border-radius:10px;border:1px solid #efe8de}
+  .reveal-pain-icon{font-size:22px;flex-shrink:0;width:30px;text-align:center}
+  .reveal-pain-text{font-size:13px;color:#2c2c2c;line-height:1.5}
+  .reveal-closing{font-size:13px;color:#5b3a1a;margin-top:10px;font-weight:600;text-align:center}
+  .reveal-tap{position:absolute;top:18px;right:18px;font-size:11px;color:#ccc;letter-spacing:1px}
+  /* 第三張卡特別的揭曉動畫 */
+  .reveal-card.final.open .back{animation:finalGlow 1.2s ease}
+  @keyframes finalGlow{
+    0%{box-shadow:0 0 0 0 rgba(232,160,64,.6)}
+    50%{box-shadow:0 0 0 14px rgba(232,160,64,0)}
+    100%{box-shadow:0 4px 18px rgba(0,0,0,.06)}
+  }
+
+  .reveal-cta-area{opacity:0;transition:opacity .5s ease;pointer-events:none}
+  .reveal-cta-area.show{opacity:1;pointer-events:auto}
+
+  /* === Result === */
+  .result{padding:24px 20px 80px;animation:fadeIn .5s ease;position:relative;overflow:hidden}
+  /* 親筆信開場 */
+  .r-letter{background:linear-gradient(180deg,#fff8e8,#fdfaf5);border:1px solid #efe8de;border-radius:20px;padding:22px 22px;margin-bottom:14px;text-align:left;line-height:1.85}
+  .r-letter .salute{font-size:13px;color:#b8956a;letter-spacing:2px;margin-bottom:8px;font-weight:600}
+  .r-letter .you-line{font-size:18px;font-weight:700;color:#2c2c2c;margin-bottom:10px;line-height:1.5}
+  .r-letter .you-line em{font-style:normal;color:#b8956a;border-bottom:2px solid #ffd98a;padding-bottom:1px}
+  .r-letter .body{font-size:14px;color:#555;line-height:1.85}
+  .r-letter .sign{font-size:12px;color:#999;text-align:right;margin-top:12px;letter-spacing:1px;font-style:italic}
+
+  .r-card{background:white;border-radius:24px;padding:32px 22px;box-shadow:0 4px 20px rgba(0,0,0,.04);text-align:center;position:relative}
+  .r-badge{display:inline-block;background:#2c2c2c;color:white;font-size:11px;font-weight:600;padding:6px 18px;border-radius:20px;margin-bottom:18px;letter-spacing:2px}
+  .r-title{font-size:32px;font-weight:700;margin-bottom:6px;animation:titlePop .9s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes titlePop{0%{opacity:0;transform:scale(.6)}60%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+  .r-code{font-size:13px;color:#bbb;margin-bottom:14px;letter-spacing:1px}
+  .r-social{font-size:12px;color:#888;margin-bottom:22px}
+  .r-social b{color:#b8956a;font-weight:700}
+  /* 慶祝粒子 */
+  .confetti{position:absolute;width:8px;height:8px;border-radius:2px;opacity:0;pointer-events:none}
+  @keyframes confettiFall{
+    0%{opacity:0;transform:translateY(-40px) rotate(0deg)}
+    20%{opacity:1}
+    100%{opacity:0;transform:translateY(420px) rotate(720deg)}
+  }
+
+  /* === 時間軸三點（漏斗 demo 套入） === */
+  .timeline{background:#fdfaf5;border:1px solid #efe8de;border-radius:16px;padding:20px;margin-top:8px}
+  .tl-h{font-size:13px;color:#b8956a;letter-spacing:2px;margin-bottom:12px;font-weight:600;text-align:center}
+  .tl-row{display:flex;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #efe8de}
+  .tl-row:last-child{border-bottom:none}
+  .tl-icon{font-size:28px;flex-shrink:0;width:42px;text-align:center}
+  .tl-body{flex:1;text-align:left}
+  .tl-when{font-size:13px;color:#b8956a;font-weight:600;letter-spacing:1px}
+  .tl-what{font-size:15px;color:#2c2c2c;font-weight:600;margin-top:2px}
+  .tl-why{font-size:12px;color:#888;margin-top:2px}
+
+  /* === 工具包定價區（漏斗 demo product-card） === */
+  .pack{
+    border:2px solid #b8956a;border-radius:20px;padding:22px 20px;margin-top:16px;
+    background:linear-gradient(180deg,#fff8e8,#fff);position:relative;
+  }
+  .pack-tag{position:absolute;top:-12px;left:20px;background:#b8956a;color:white;font-size:11px;padding:4px 12px;border-radius:12px;letter-spacing:1px;font-weight:600}
+  .pack-name{font-size:20px;font-weight:800;color:#2c2c2c;margin-bottom:6px}
+  .pack-tagline{font-size:13px;color:#888;margin-bottom:14px}
+  .pack-reason{background:white;border-radius:12px;padding:14px 16px;font-size:13px;color:#555;line-height:1.7;margin-bottom:14px;text-align:left}
+  .pack-reason b{color:#b8956a}
+  .pack-price{display:flex;align-items:baseline;gap:10px}
+  .pack-now{font-size:28px;font-weight:800;color:#d4501e}
+  .pack-old{font-size:14px;color:#aaa;text-decoration:line-through}
+  .pack-save{font-size:12px;color:#4caf7a;font-weight:600;margin-left:auto}
+
+  /* 加購卡 */
+  .addon-row{margin-top:18px}
+  .addon-h{font-size:13px;color:#888;margin-bottom:10px;text-align:left;padding-left:4px}
+  .addon{display:flex;gap:12px;align-items:center;padding:12px 14px;background:white;border:1px solid #efe8de;border-radius:12px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+  .addon:hover{border-color:#b8956a;background:#fdfaf5}
+  .addon-thumb{width:42px;height:42px;border-radius:10px;background:#fdfaf5;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+  .addon-mid{flex:1;text-align:left}
+  .addon-name{font-size:14px;font-weight:600}
+  .addon-price{font-size:12px;color:#888;margin-top:2px}
+  .addon input{width:20px;height:20px;accent-color:#b8956a}
+
+  .r-combo-label{font-size:12px;color:#bbb;letter-spacing:1px;margin-bottom:10px}
+  .r-pills{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:24px;font-size:13px;font-weight:600;color:white}
+  .pill-red{background:#e05252}.pill-orange{background:#e8a040}
+  .pill-yellow{background:#e8d040;color:#555}.pill-green{background:#4caf7a}
+  .pill-blue{background:#4a90d9}.pill-indigo{background:#7c6dd8}
+  .pill-purple{background:#9c5bb5}.pill-coffee{background:#8d6e55}
+  .pill-rice{background:#8b6fc0}.pill-cocoa{background:#6d5243}
+  .pill-count{background:rgba(255,255,255,.25);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px}
+  .pill-yellow .pill-count{background:rgba(0,0,0,.1)}
+
+  .r-desc{font-size:14px;color:#666;line-height:1.8;margin-bottom:22px;text-align:left;background:#fdfaf5;padding:18px;border-radius:16px;border-left:4px solid #b8956a}
+  .r-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:24px}
+  .r-tag{background:#fdfaf5;color:#b8956a;padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid #efe8de}
+
+  /* optimization 6: 為什麼是這套 */
+  .r-why{margin-bottom:24px;text-align:left}
+  .r-why summary{cursor:pointer;list-style:none;font-size:13px;color:#b8956a;padding:10px 14px;background:#fdfaf5;border-radius:12px;border:1px solid #efe8de;display:flex;justify-content:space-between;align-items:center}
+  .r-why summary::-webkit-details-marker{display:none}
+  .r-why summary::after{content:'▾';color:#b8956a;transition:transform .2s}
+  .r-why[open] summary::after{transform:rotate(180deg)}
+  .r-why .why-body{padding:14px 16px 4px;font-size:13px;color:#666;line-height:1.8}
+  .r-why .why-body li{margin-bottom:6px;list-style:none;padding-left:20px;position:relative}
+  .r-why .why-body li::before{content:'·';position:absolute;left:8px;color:#b8956a;font-weight:700}
+
+  .r-keep{font-size:12px;color:#999;margin-bottom:18px;background:#fafaf8;padding:10px 14px;border-radius:12px;display:flex;align-items:center;gap:8px;justify-content:center}
+  .r-keep b{color:#b8956a}
+
+  .btn-cta{background:#2c2c2c;color:white;border:none;padding:16px 40px;font-size:16px;font-weight:600;border-radius:50px;cursor:pointer;font-family:inherit;letter-spacing:1px;width:100%;margin-bottom:10px;transition:all .3s}
+  .btn-cta:hover{background:#444;transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+  .btn-ghost{background:transparent;color:#aaa;border:none;padding:12px;font-size:13px;cursor:pointer;font-family:inherit;width:100%}
+  .btn-ghost:hover{color:#888}
+
+  /* optimization 3: 右下角可折抵小條 */
+  .wallet-hint{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:white;border:1px solid #efe8de;border-radius:50px;
+    padding:10px 18px;font-size:13px;color:#b8956a;
+    box-shadow:0 4px 16px rgba(184,149,106,.18);cursor:pointer;
+    display:flex;align-items:center;gap:8px;z-index:50;
+    animation:slideUp .5s ease;max-width:90vw;
+  }
+  @keyframes slideUp{from{transform:translate(-50%,80px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+  .wallet-hint b{color:#2c2c2c}
+  .wallet-hint .wallet-arrow{margin-left:4px;color:#b8956a}
+
+  /* === Wallet intermediary === */
+  .wallet{padding:32px 20px 40px;animation:fadeIn .4s ease}
+  .wallet-card{background:white;border-radius:24px;padding:32px 24px 28px;box-shadow:0 8px 32px rgba(184,149,106,.12);position:relative;overflow:hidden}
+  .wallet-card::before{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,#fff8e8,transparent 70%);pointer-events:none}
+  .wallet-icon{width:72px;height:72px;margin:0 auto 16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#ffd98a 55%,#e8a040 100%);box-shadow:0 8px 30px rgba(232,160,64,.4);display:flex;align-items:center;justify-content:center;font-size:34px;animation:bulbBreath 3s ease-in-out infinite;position:relative;z-index:1}
+  .wallet-headline{font-size:12px;color:#b8956a;letter-spacing:3px;margin-bottom:8px;text-align:center;font-weight:700;position:relative;z-index:1}
+  .wallet-h{font-size:24px;font-weight:700;text-align:center;margin-bottom:10px;line-height:1.5;position:relative;z-index:1}
+  .wallet-sub{font-size:14px;color:#888;text-align:center;margin-bottom:24px;line-height:1.8;position:relative;z-index:1}
+  .perk{display:flex;gap:14px;background:#fdfaf5;border:1px solid #efe8de;border-radius:18px;padding:18px;margin-bottom:12px;align-items:center;transition:all .25s;position:relative;z-index:1}
+  .perk:hover{transform:translateX(2px);box-shadow:0 4px 14px rgba(184,149,106,.12)}
+  .perk-icon{width:48px;height:48px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;border:1px solid #efe8de;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .perk-main{font-size:15px;font-weight:600;margin-bottom:3px}
+  .perk-sub{font-size:12px;color:#888;line-height:1.6}
+  .perk-amount{font-size:20px;font-weight:800;color:#d4501e;margin-left:auto;letter-spacing:-.5px}
+  .wallet-total{
+    background:linear-gradient(135deg,#2c2c2c,#3d3530);color:white;border-radius:18px;
+    padding:16px 20px;display:flex;justify-content:space-between;align-items:center;
+    margin:16px 0 22px;position:relative;z-index:1;
+    box-shadow:0 6px 20px rgba(44,44,44,.2);
+  }
+  .wallet-total .label{font-size:13px;opacity:.7;letter-spacing:1px}
+  .wallet-total .amt{font-size:26px;font-weight:800;color:#ffd98a;letter-spacing:-.5px}
+
+  /* === Register simulate === */
+  .reg{padding:32px 20px 40px;animation:fadeIn .4s ease}
+  .reg-banner{
+    background:linear-gradient(135deg,#ffd86b,#f5a623);color:white;
+    border-radius:18px;padding:18px 20px;margin-bottom:16px;
+    font-size:14px;line-height:1.6;display:flex;align-items:center;gap:14px;
+    box-shadow:0 8px 24px rgba(245,166,35,.25);position:relative;overflow:hidden;
+  }
+  .reg-banner::after{content:'';position:absolute;top:-30px;right:-30px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.18);pointer-events:none}
+  .reg-banner .cake{font-size:34px;flex-shrink:0;animation:cakeBounce 1.8s ease-in-out infinite}
+  @keyframes cakeBounce{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-3px) rotate(5deg)}}
+  .reg-banner b{font-size:17px;display:block;margin-bottom:2px;font-weight:800}
+  .reg-banner small{opacity:.9;font-size:12px}
+  .reg-card{background:white;border-radius:24px;padding:30px 24px;box-shadow:0 8px 28px rgba(0,0,0,.06)}
+  .reg-h{font-size:24px;font-weight:700;margin-bottom:6px}
+  .reg-sub{font-size:13px;color:#888;margin-bottom:24px}
+  .field{margin-bottom:16px}
+  .field label{font-size:13px;color:#666;margin-bottom:6px;display:block;font-weight:500}
+  .field input{width:100%;padding:14px 16px;font-size:15px;border:1.5px solid #efe8de;border-radius:14px;font-family:inherit;background:#fafaf8;transition:all .2s}
+  .field input:focus{outline:none;border-color:#b8956a;background:white;box-shadow:0 0 0 4px rgba(184,149,106,.1)}
+  .field .hint-line{font-size:11px;color:#b8956a;margin-top:6px;display:flex;align-items:center;gap:4px}
+
+  /* === LINE simulate === */
+  .line{padding:32px 20px 40px;animation:fadeIn .4s ease;text-align:center}
+  .line-card{background:white;border-radius:24px;padding:36px 24px 32px;box-shadow:0 8px 32px rgba(0,0,0,.06)}
+  .line-success{
+    display:inline-flex;align-items:center;gap:8px;
+    background:linear-gradient(135deg,#d8ecdf,#e8f4ee);color:#3a9963;
+    padding:10px 22px;border-radius:50px;font-size:13px;margin-bottom:20px;
+    font-weight:600;box-shadow:0 4px 14px rgba(76,175,122,.15);
+    animation:successPop .6s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes successPop{0%{opacity:0;transform:scale(.7)}60%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+  .line-success .check{width:18px;height:18px;border-radius:50%;background:#4caf7a;color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+  .line-bonus{
+    display:inline-block;background:linear-gradient(135deg,#06c755,#0fae50);color:white;
+    padding:6px 16px;border-radius:14px;font-size:13px;margin-bottom:12px;
+    font-weight:600;letter-spacing:1px;box-shadow:0 4px 12px rgba(6,199,85,.3);
+  }
+  .line-h{font-size:24px;font-weight:700;margin-bottom:8px;line-height:1.5}
+  .line-h em{font-style:normal;color:#06c755}
+  .line-sub{font-size:14px;color:#888;line-height:1.8;margin-bottom:24px}
+  .line-qr{
+    width:170px;height:170px;margin:0 auto 22px;border-radius:18px;
+    background:white;padding:14px;
+    box-shadow:0 6px 24px rgba(6,199,85,.15);border:1px solid #efe8de;
+    display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);gap:2px;
+  }
+  .qr-pixel{background:#2c2c2c;border-radius:1px}
+  .qr-blank{background:transparent}
+  .line-btn{
+    background:linear-gradient(135deg,#06c755,#0fae50);color:white;border:none;
+    padding:16px 36px;font-size:16px;font-weight:700;border-radius:50px;cursor:pointer;
+    font-family:inherit;letter-spacing:1px;margin-bottom:10px;
+    box-shadow:0 8px 22px rgba(6,199,85,.3);transition:all .25s;
+  }
+  .line-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(6,199,85,.4)}
+  .line-btn:active{transform:scale(.97)}
+
+  /* === Cart simulate === */
+  .cart{padding:24px 20px 40px;animation:fadeIn .4s ease}
+  .cart-h{font-size:14px;color:#bbb;letter-spacing:2px;margin-bottom:14px;text-align:center}
+  .cart-card{background:white;border-radius:24px;padding:24px 22px;box-shadow:0 4px 20px rgba(0,0,0,.04);margin-bottom:14px}
+  .cart-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f5f3ef;font-size:14px}
+  .cart-row:last-of-type{border-bottom:none}
+  .cart-row.discount{color:#4caf7a}
+  .cart-total{display:flex;justify-content:space-between;font-size:18px;font-weight:700;padding-top:14px;border-top:2px solid #efe8de;margin-top:8px}
+  .cart-remain{background:#fdfaf5;border:1px solid #efe8de;border-radius:16px;padding:14px 16px;font-size:13px;color:#b8956a;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .cart-bonus{background:#2c2c2c;color:white;border-radius:16px;padding:14px 16px;font-size:13px;margin-bottom:18px;line-height:1.7}
+  .cart-bonus b{color:#d4b87a}
+
+  /* === Restart bar === */
+  .restart-bar{text-align:center;padding:20px}
+
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app">
+
+  <!-- ═══ Page: Landing ═══ -->
+  <section class="landing" id="page-landing">
+    <div class="bulb"></div>
+    <span class="brand-tag">MAYBEYOU ・ 燈泡菌</span>
+    <h1>最近還好嗎？<br>讓我們<em>聽你說 8 件事</em></h1>
+    <p class="sub">不是賣你東西的測驗<br><b>是為了真的搞懂你現在需要什麼</b></p>
+    <div class="value-grid">
+      <div class="value-item"><div class="v-num">3</div><div class="v-label">分鐘</div></div>
+      <div class="value-item"><div class="v-num">14</div><div class="v-label">種配方</div></div>
+      <div class="value-item"><div class="v-num">$700</div><div class="v-label">購物金</div></div>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">好啊，開始聊</button>
+    <p class="note">完成後即可領 700 元購物金</p>
+    <div class="social-strip">
+      <div class="avatars">
+        <div class="ava" style="background:#ffd98a">林</div>
+        <div class="ava" style="background:#c8e6a0">陳</div>
+        <div class="ava" style="background:#b8c8e8">王</div>
+        <div class="ava" style="background:#e8b8c8">楊</div>
+        <div class="ava more">+</div>
+      </div>
+      <div class="social-text"><b>3,247 位</b>朋友找到自己的配方</div>
+    </div>
+    <div class="reviews-strip">
+      <div class="review-card">
+        <div class="stars">★★★★★</div>
+        <p>「測完才知道我需要的不是更多保健品，是固定時間吃。」</p>
+        <span>— 蔡小姐 ・ 32 歲 ・ 外食族</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Page: Quiz ═══ -->
+  <section class="hidden" id="page-quiz">
+    <div class="progress-wrap">
+      <div class="progress-bg"><div class="progress-fill" id="pg-fill"></div></div>
+      <div class="progress-text" id="pg-text"></div>
+    </div>
+
+    <!-- 漸進速寫句 -->
+    <div class="sketch empty" id="sketch">
+      <div class="sketch-label">我們認識的你</div>
+      <div class="sketch-body" id="sketch-body"></div>
+    </div>
+
+    <div id="q-host"></div>
+  </section>
+
+  <!-- 同理過場 banner -->
+  <div class="empathy" id="empathy"></div>
+
+  <!-- 主題大過場（題目分區） -->
+  <div class="topic-pass" id="topic-pass">
+    <div class="tp-skip" id="tp-skip">×</div>
+    <div class="tp-icon" id="tp-icon">🌱</div>
+    <div class="tp-label" id="tp-label">CHAPTER 2</div>
+    <div class="tp-title" id="tp-title">接下來，聊聊你的日常</div>
+    <div class="tp-sub" id="tp-sub">飲食、腸胃、睡眠</div>
+    <div class="tp-tap">點任一處跳過</div>
+  </div>
+
+  <!-- sticky bottom CTA（只在結果頁顯示） -->
+  <div class="sticky-cta" id="sticky-cta">
+    <div class="price-block">
+      <span class="price-now" id="sticky-price">$1,580</span>
+      <div class="price-meta">為你保留 7 天 ・ <b id="sticky-save">省 $400</b></div>
+    </div>
+    <button onclick="goWallet()">幫我準備這套</button>
+  </div>
+
+  <!-- ═══ Page: Analyzing（個人化分析中） ═══ -->
+  <section class="hidden" id="page-analyzing">
+    <div class="analyze">
+      <div class="analyze-orb"></div>
+      <div class="analyze-line" id="ana-1"></div>
+      <div class="analyze-line" id="ana-2"></div>
+      <div class="analyze-line" id="ana-3"></div>
+      <div class="analyze-line" id="ana-4"></div>
+    </div>
+  </section>
+
+  <!-- ═══ Page: Reveal (3-card flip) ═══ -->
+  <section class="hidden" id="page-reveal"></section>
+
+  <!-- ═══ Page: Result ═══ -->
+  <section class="hidden" id="page-result"></section>
+
+  <!-- ═══ Page: Wallet intermediary ═══ -->
+  <section class="hidden" id="page-wallet"></section>
+
+  <!-- ═══ Page: Register simulate ═══ -->
+  <section class="hidden" id="page-reg"></section>
+
+  <!-- ═══ Page: LINE simulate ═══ -->
+  <section class="hidden" id="page-line"></section>
+
+  <!-- ═══ Page: Cart simulate ═══ -->
+  <section class="hidden" id="page-cart"></section>
+
+  <!-- restart -->
+  <div class="restart-bar"><button class="btn-ghost" onclick="restart()">從頭再玩一次</button></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   資料：題目 + 結果 + 計分（從現有測驗沿用 D1-D14）
+   ═══════════════════════════════════════════════════ */
+var questions = [
+  { id:'gender', title:'你的性別是？',
+    profile:function(v){ return v==='male'?'男性':'女性' },
+    options:[
+      {icon:'🧔',text:'男性',value:'male'},
+      {icon:'👩',text:'女性',value:'female'}
+    ]
+  },
+  { id:'age', title:'你的年齡層？',
+    profile:function(v){
+      return {teen:'18歲以下',young:'19-35 歲',middle:'36-55 歲',senior:'55 歲以上'}[v]
+    },
+    options:[
+      {icon:'📚',text:'18 歲以下（學生／考生）',value:'teen'},
+      {icon:'💼',text:'19 – 35 歲（青壯年）',value:'young'},
+      {icon:'🏠',text:'36 – 55 歲（熟齡）',value:'middle'},
+      {icon:'🌿',text:'55 歲以上（銀髮族）',value:'senior'}
+    ]
+  },
+  { id:'goal', title:'你最在意的健康目標？',
+    profile:function(v){
+      return {slim:'想瘦身',digest:'顧腸胃',energy:'要精神',sleep:'求好眠',beauty:'好氣色',immunity:'強體力'}[v]
+    },
+    options:[
+      {icon:'🔥',text:'想瘦身／控制體態',value:'slim'},
+      {icon:'🫧',text:'改善消化、排便順暢',value:'digest'},
+      {icon:'⚡',text:'提升精神與專注力',value:'energy'},
+      {icon:'🌙',text:'改善睡眠品質、舒壓',value:'sleep'},
+      {icon:'✨',text:'養顏美容、好氣色',value:'beauty'},
+      {icon:'💪',text:'增強體力與免疫力',value:'immunity'}
+    ]
+  },
+  { id:'diet', title:'你的飲食習慣偏向？',
+    profile:function(v){
+      return {eating_out:'外食族',carbs:'愛澱粉甜食',balanced:'飲食均衡',fitness:'健身飲食'}[v]
+    },
+    options:[
+      {icon:'🍱',text:'經常外食，飲食不規律',value:'eating_out'},
+      {icon:'🍞',text:'愛吃澱粉、甜食，難以控制',value:'carbs'},
+      {icon:'🥗',text:'飲食均衡，想加強營養補充',value:'balanced'},
+      {icon:'🏋️',text:'有在健身，注重蛋白質攝取',value:'fitness'}
+    ]
+  },
+  { id:'gut', title:'你的腸胃狀況如何？',
+    profile:function(v){
+      return {bloat:'容易脹氣',constipation:'排便不順',sensitive:'腸胃敏感',normal:'腸胃還好'}[v]
+    },
+    options:[
+      {icon:'😣',text:'經常脹氣、消化不良',value:'bloat'},
+      {icon:'😤',text:'排便不順暢，容易便秘',value:'constipation'},
+      {icon:'😰',text:'腸胃敏感，容易拉肚子',value:'sensitive'},
+      {icon:'😊',text:'還算正常，沒什麼大問題',value:'normal'}
+    ]
+  },
+  { id:'sleep', title:'你的睡眠與壓力狀態？',
+    profile:function(v){
+      return {poor:'熬夜睡不好',stressed:'壓力大',tired:'白天易累',good:'睡眠正常'}[v]
+    },
+    options:[
+      {icon:'🦉',text:'經常熬夜，睡眠品質差',value:'poor'},
+      {icon:'😩',text:'壓力大，難以放鬆入睡',value:'stressed'},
+      {icon:'🥱',text:'睡眠還可以，但白天容易疲倦',value:'tired'},
+      {icon:'😴',text:'睡眠正常，精神不錯',value:'good'}
+    ]
+  },
+  { id:'skin', title:'你的外在／肌膚困擾？',
+    profile:function(v){
+      return {dull:'氣色暗沉',unstable:'膚況不穩',intimate:'私密保養',none:'肌膚還好'}[v]
+    },
+    options:[
+      {icon:'🌑',text:'膚色暗沉、氣色差',value:'dull'},
+      {icon:'💆',text:'保養品吸收差、膚況不穩定',value:'unstable'},
+      {icon:'🩷',text:'女性私密處容易不舒服',value:'intimate'},
+      {icon:'👌',text:'沒有特別困擾',value:'none'}
+    ]
+  },
+  { id:'exercise', title:'你有運動習慣嗎？',
+    profile:function(v){
+      return {none:'不太運動',light:'偶爾運動',regular:'規律健身',intense:'高強度運動'}[v]
+    },
+    options:[
+      {icon:'🛋️',text:'幾乎不運動',value:'none'},
+      {icon:'🚶',text:'偶爾運動（每週 1-2 次）',value:'light'},
+      {icon:'🏃',text:'規律運動／健身（每週 3 次以上）',value:'regular'},
+      {icon:'🔥',text:'高強度運動或體力勞動者',value:'intense'}
+    ]
+  }
+];
+
+var results = {
+  D1:{code:'D1',name:'幫助消化道機能',combo:'紅1 綠1 橙1 可2',desc:'針對腸胃不適、消化不良，紅色控制飲食、綠色調理腸胃、橙色幫助放鬆，加上可可馬甲光纖飲促進腸道好菌。',tags:['腸胃保健','消化不良','排便順暢'],pills:[{c:'red',n:'紅燈泡菌',q:1},{c:'green',n:'綠燈泡菌',q:1},{c:'orange',n:'橙燈泡菌',q:1},{c:'cocoa',n:'可可飲',q:2}]},
+  D2:{code:'D2',name:'閃電輕盈',combo:'紅2 綠1 米2 咖1',desc:'雙倍紅色燈泡菌狙擊熱量、綠色提升代謝、紫米飲增加飽足感、咖啡加速燃燒。',tags:['體態管理','控制食慾','加速代謝'],pills:[{c:'red',n:'紅燈泡菌',q:2},{c:'green',n:'綠燈泡菌',q:1},{c:'rice',n:'紫米飲',q:2},{c:'coffee',n:'咖啡飲',q:1}]},
+  D3:{code:'D3',name:'促進新陳代謝',combo:'藍1 靛1 黃1 咖1 可1',desc:'藍色提振精神、靛色強化防護、黃色鞏固骨骼，搭配咖啡與可可雙口味，循環更順暢。',tags:['新陳代謝','精神提振','循環順暢'],pills:[{c:'blue',n:'藍燈泡菌',q:1},{c:'indigo',n:'靛燈泡菌',q:1},{c:'yellow',n:'黃燈泡菌',q:1},{c:'coffee',n:'咖啡飲',q:1},{c:'cocoa',n:'可可飲',q:1}]},
+  D4:{code:'D4',name:'身體循環不卡卡',combo:'紅1 綠1 橙1 米2',desc:'紅色控制飲食、綠色調理腸胃、橙色舒壓助眠，紫米飲補蛋白質維持體力，外食族也能好好維持。',tags:['外食族','腸胃調理','體態維持'],pills:[{c:'red',n:'紅燈泡菌',q:1},{c:'green',n:'綠燈泡菌',q:1},{c:'orange',n:'橙燈泡菌',q:1},{c:'rice',n:'紫米飲',q:2}]},
+  D5:{code:'D5',name:'活力好氣色',combo:'藍1 綠1 橙1 米2',desc:'藍色提神、綠色增強抵抗力、橙色助眠，搭配紫米飲維持好氣色與活力，由內而外自然光采。',tags:['好氣色','活力充沛','由內而外'],pills:[{c:'blue',n:'藍燈泡菌',q:1},{c:'green',n:'綠燈泡菌',q:1},{c:'orange',n:'橙燈泡菌',q:1},{c:'rice',n:'紫米飲',q:2}]},
+  D6:{code:'D6',name:'日夜煥亮',combo:'紅1 靛1 紫1 米2',desc:'紅色控制飲食、靛色守護私密、紫色美白提亮，搭配紫米飲補營養，24 小時持續煥亮。',tags:['美白提亮','私密保養','全天候'],pills:[{c:'red',n:'紅燈泡菌',q:1},{c:'indigo',n:'靛燈泡菌',q:1},{c:'purple',n:'紫燈泡菌',q:1},{c:'rice',n:'紫米飲',q:2}]},
+  D7:{code:'D7',name:'小資女調理',combo:'紅1 綠1 橙1 米1',desc:'精打細算的日常保養！紅維持體態、綠顧腸胃、橙舒壓好眠，搭一杯紫米飲，簡單四步搞定。',tags:['日常保養','高CP值','輕鬆維持'],pills:[{c:'red',n:'紅燈泡菌',q:1},{c:'green',n:'綠燈泡菌',q:1},{c:'orange',n:'橙燈泡菌',q:1},{c:'rice',n:'紫米飲',q:1}]},
+  D8:{code:'D8',name:'白富美保養',combo:'藍1 靛1 橙1 紫1 咖1',desc:'頂級全方位保養！藍提神、靛防護、橙助眠、紫提亮，搭配咖啡飲促進代謝，從頭到腳一次到位。',tags:['全方位','頂級保養','美白抗老'],pills:[{c:'blue',n:'藍燈泡菌',q:1},{c:'indigo',n:'靛燈泡菌',q:1},{c:'orange',n:'橙燈泡菌',q:1},{c:'purple',n:'紫燈泡菌',q:1},{c:'coffee',n:'咖啡飲',q:1}]},
+  D9:{code:'D9',name:'精緻男調理',combo:'藍1 橙1 咖1',desc:'忙碌男性的精簡方案。藍色提振、橙色舒壓，搭配咖啡飲補能量，三步搞定每日保養。',tags:['男性保養','專注力','精簡有效'],pills:[{c:'blue',n:'藍燈泡菌',q:1},{c:'orange',n:'橙燈泡菌',q:1},{c:'coffee',n:'咖啡飲',q:1}]},
+  D10:{code:'D10',name:'高富帥保養',combo:'藍1 綠1 橙1 黃1 咖1 可1',desc:'全面型男方案！藍提神、綠免疫、橙助眠、黃骨骼，搭配咖啡可可雙倍飲，打造強健體魄。',tags:['全面保養','運動族','強健體魄'],pills:[{c:'blue',n:'藍燈泡菌',q:1},{c:'green',n:'綠燈泡菌',q:1},{c:'orange',n:'橙燈泡菌',q:1},{c:'yellow',n:'黃燈泡菌',q:1},{c:'coffee',n:'咖啡飲',q:1},{c:'cocoa',n:'可可飲',q:1}]},
+  D11:{code:'D11',name:'考生調理',combo:'黃1 綠1 橙1 米1 可1',desc:'考生專用！黃色顧骨骼、綠色顧免疫、橙色舒壓助眠，搭配紫米和可可飲，讀書專注、抗壓力強。',tags:['考生','專注力','抗壓'],pills:[{c:'yellow',n:'黃燈泡菌',q:1},{c:'green',n:'綠燈泡菌',q:1},{c:'orange',n:'橙燈泡菌',q:1},{c:'rice',n:'紫米飲',q:1},{c:'cocoa',n:'可可飲',q:1}]},
+  D12:{code:'D12',name:'孩童成長',combo:'黃1 綠1 橙1 可1',desc:'為成長中的孩子打基礎！黃色骨骼、綠色腸胃、橙色睡眠，搭配好喝可可飲，健康成長每一天。',tags:['孩童','骨骼發展','成長期'],pills:[{c:'yellow',n:'黃燈泡菌',q:1},{c:'green',n:'綠燈泡菌',q:1},{c:'orange',n:'橙燈泡菌',q:1},{c:'cocoa',n:'可可飲',q:1}]},
+  D13:{code:'D13',name:'銀髮族保健',combo:'黃1 綠1 橙1 米1',desc:'守護長輩健康！黃色顧骨骼、綠色免疫力、橙色助眠，搭配紫米飲補蛋白維持肌力。',tags:['銀髮族','骨骼保健','免疫力'],pills:[{c:'yellow',n:'黃燈泡菌',q:1},{c:'green',n:'綠燈泡菌',q:1},{c:'orange',n:'橙燈泡菌',q:1},{c:'rice',n:'紫米飲',q:1}]},
+  D14:{code:'D14',name:'夫妻生活調理',combo:'靛2 藍2 綠2 咖2 可2',desc:'夫妻雙方共同保養。靛色守護私密、藍色提振、綠色增強體力，搭配雙口味馬甲光纖飲。',tags:['夫妻保養','私密健康','活力充沛'],pills:[{c:'indigo',n:'靛燈泡菌',q:2},{c:'blue',n:'藍燈泡菌',q:2},{c:'green',n:'綠燈泡菌',q:2},{c:'coffee',n:'咖啡飲',q:2},{c:'cocoa',n:'可可飲',q:2}]}
+};
+
+/* D 碼 → 工具包包裝（漏斗 demo 風格的「為你準備的 XX 工具包」） */
+var packs = {
+  D1:{name:'腸道暖機工具包',tag:'消化道每天都要被照顧',reason:'你最常抱怨的是「肚子卡卡」——這套把<b>紅綠橙燈泡菌</b>湊齊、配上可可飲調味，從吃下去那刻開始就在幫腸道暖機。',now:1480,old:1880},
+  D2:{name:'體態管理工具包',tag:'瘦身不再靠意志力',reason:'你想瘦，但餓肚子撐不住——這套用<b>雙倍紅燈泡菌</b>幫你控制飲食、紫米飲增加飽足，咖啡口味加速代謝，<b>用配方而不是意志力</b>。',now:1980,old:2480},
+  D3:{name:'代謝循環工具包',tag:'從內把循環打開',reason:'你需要的不是更多保健品，是讓身體裡的<b>循環真的動起來</b>。這套五合一，提神、防護、骨骼一起補。',now:2280,old:2880},
+  D4:{name:'外食族工具包',tag:'吃外食也能維持狀態',reason:'你一週外食七天，便當盒裡的營養根本不夠——這套用<b>紅綠橙</b>三色彌補，紫米飲加蛋白，<b>你照吃，它照補</b>。',now:1780,old:2280},
+  D5:{name:'氣色光采工具包',tag:'從內裡亮回來',reason:'你也想光鮮亮麗，可是怎麼睡都還是暗沉——這套<b>藍綠橙</b>從精神、抵抗力、睡眠三路一起來，紫米飲補蛋白，<b>讓氣色從內裡亮回來</b>。',now:1780,old:2280},
+  D6:{name:'日夜煥亮工具包',tag:'白天亮晚上修',reason:'你白天要見人，晚上又想好好修護——這套<b>紅靛紫</b>白天亮、晚上修，紫米飲補營養，<b>24 小時都在為你工作</b>。',now:1980,old:2480},
+  D7:{name:'小資女工具包',tag:'預算有限，也要照顧好自己',reason:'你在意 CP 值又想看到效果——這套把單買要 $1,980 的四罐降到一個價，<b>每天平均不到 $50</b>，剛好夠。',now:1580,old:1980},
+  D8:{name:'白富美工具包',tag:'頂級的，全部給你',reason:'你想要的是全方位——這套<b>五合一</b>從提神、防護、舒壓、提亮一次到位，加咖啡飲促進代謝，<b>從頭到腳都有人照顧</b>。',now:2680,old:3280},
+  D9:{name:'精緻男工具包',tag:'三步搞定每日保養',reason:'你很忙，不想花時間挑——這套<b>藍橙咖</b>三件式，早中晚各一杯，精神、舒壓、能量一次補齊。',now:1380,old:1780},
+  D10:{name:'高富帥工具包',tag:'運動族的全套後勤',reason:'你有在動，那身體需要的補給也要跟上——這套<b>六合一</b>從免疫到骨骼，雙口味馬甲光纖飲補能量，<b>打造強健體魄</b>。',now:2580,old:3180},
+  D11:{name:'考生抗壓工具包',tag:'讀書讀得久也撐得住',reason:'你或你的孩子在考期——這套<b>黃綠橙</b>顧骨骼、免疫、睡眠，紫米加可可雙飲補體力，<b>專注力跟抗壓力一起來</b>。',now:1680,old:2180},
+  D12:{name:'孩童成長工具包',tag:'好喝又有料的成長補給',reason:'家裡有小朋友——這套<b>黃綠橙</b>顧骨骼、腸胃、睡眠，搭配好喝可可飲，<b>小孩會願意天天喝</b>。',now:1480,old:1880},
+  D13:{name:'銀髮族保健工具包',tag:'守護長輩的每一天',reason:'長輩需要的是穩定的日常——這套<b>黃綠橙</b>顧骨骼、免疫、好眠，紫米飲補蛋白維持肌力，<b>每天一份，剛剛好</b>。',now:1680,old:2180},
+  D14:{name:'夫妻共保工具包',tag:'兩個人一起好好的',reason:'你們要一起好好的——這套<b>靛藍綠</b>雙倍量，私密、精神、體力一起顧，雙口味飲品讓兩人各取所需。',now:2980,old:3680}
+};
+
+/* D 碼 → 時間軸（早中晚怎麼吃） */
+function getTimeline(r){
+  // 找 pills 主色，按時段分配
+  var pillByColor = {};
+  r.pills.forEach(function(p){ pillByColor[p.c] = p; });
+  // 早：紅/黃/紫
+  // 下午：藍/橙/紫米/咖啡
+  // 睡前：綠/靛/紫/可可
+  var morning = pillByColor.red || pillByColor.yellow || pillByColor.purple || r.pills[0];
+  var afternoon = pillByColor.blue || pillByColor.orange || pillByColor.rice || pillByColor.coffee || r.pills[Math.min(1,r.pills.length-1)];
+  var night = pillByColor.green || pillByColor.indigo || pillByColor.cocoa || pillByColor.purple || r.pills[r.pills.length-1];
+  return [
+    {when:'早餐後',icon:'🌅',what:morning.n,why:morning.c==='red'?'幫腸道暖機、控制食慾':morning.c==='yellow'?'鞏固骨骼，一天的基底':morning.c==='purple'?'美白提亮，從早就開始':'開啟你的一天'},
+    {when:'下午 3 點',icon:'☕',what:afternoon.n,why:afternoon.c==='blue'?'提神比咖啡溫和':afternoon.c==='orange'?'舒壓緩解工作緊繃':afternoon.c==='rice'?'替代咖啡的能量補給':afternoon.c==='coffee'?'幫你撐過下午':'下午精神補一下'},
+    {when:'睡前',icon:'🌙',what:night.n,why:night.c==='green'?'給隔天的腸道暖身':night.c==='indigo'?'守護私密與防護':night.c==='cocoa'?'放鬆，幫助入睡':night.c==='purple'?'夜裡修護美白':'幫你好好睡'}
+  ];
+}
+
+var currentQ = 0, answers = {};
+
+function calculateResult(){
+  var a=answers.age, g=answers.gender, go=answers.goal, d=answers.diet, gu=answers.gut, s=answers.sleep, sk=answers.skin, e=answers.exercise;
+  if(a==='teen') return (e==='none'||e==='light')?'D11':'D12';
+  if(a==='senior') return 'D13';
+  if(g==='female' && sk==='intimate') return 'D14';
+  if(g==='male'){
+    if(go==='immunity'||(go==='energy'&&(e==='regular'||e==='intense'))) return 'D10';
+    if(go==='slim') return 'D2'; if(go==='digest') return 'D1'; return 'D9';
+  }
+  if(go==='slim') return d==='carbs'?'D2':'D4';
+  if(go==='digest') return gu==='normal'?'D4':'D1';
+  if(go==='beauty'){ if(sk==='dull'||sk==='unstable') return (d==='balanced'||e==='regular'||e==='intense')?'D8':'D6'; return 'D5'; }
+  if(go==='sleep') return sk==='dull'?'D5':'D7';
+  if(go==='energy') return s==='tired'?'D3':'D5';
+  if(go==='immunity'){ if(e==='regular'||e==='intense') return 'D3'; if(gu!=='normal') return 'D4'; return 'D7'; }
+  return 'D7';
+}
+
+/* ═══════════════════════════════════════════════════
+   頁面切換
+   ═══════════════════════════════════════════════════ */
+function show(id){
+  ['page-landing','page-quiz','page-analyzing','page-reveal','page-result','page-wallet','page-reg','page-line','page-cart']
+    .forEach(function(p){ document.getElementById(p).classList.add('hidden'); });
+  document.getElementById(id).classList.remove('hidden');
+  // 離開結果頁就關掉 sticky CTA
+  if(id !== 'page-result') hideStickyCTA();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* 同理過場 banner 句子（依答題情境） */
+function maybeEmpathy(prevQid, prevVal){
+  var msgs = [];
+  if(prevQid==='gut' && (prevVal==='bloat'||prevVal==='constipation'||prevVal==='sensitive')) msgs.push('嗯，這蠻多人都有的感覺');
+  if(prevQid==='sleep' && (prevVal==='poor'||prevVal==='stressed')) msgs.push('辛苦了，最後幾題了');
+  if(prevQid==='skin' && (prevVal==='dull'||prevVal==='unstable')) msgs.push('謝謝你告訴我這些');
+  if(prevQid==='diet' && (prevVal==='eating_out'||prevVal==='carbs')) msgs.push('外食族很常見，別擔心');
+  if(prevQid==='goal') msgs.push('好，我們繼續往下');
+  if(!msgs.length) return;
+  var el = document.getElementById('empathy');
+  el.textContent = msgs[0];
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 1100);
+}
+
+/* 主題大過場（Q3 / Q6 之前） */
+var topicMap = {
+  2: {icon:'🌱',label:'CHAPTER 2',title:'接下來，聊聊你的<br>日常生活',sub:'飲食、腸胃 ・ 4 題'},
+  5: {icon:'💫',label:'CHAPTER 3',title:'最後，聊聊你的<br>身體訊號',sub:'睡眠、肌膚、運動 ・ 3 題'}
+};
+function maybeTopic(idx){
+  var t = topicMap[idx];
+  if(!t) return Promise.resolve();
+  return new Promise(function(resolve){
+    var el = document.getElementById('topic-pass');
+    document.getElementById('tp-icon').textContent = t.icon;
+    document.getElementById('tp-label').textContent = t.label;
+    document.getElementById('tp-title').innerHTML = t.title;
+    document.getElementById('tp-sub').textContent = t.sub;
+    el.classList.add('show');
+    var autoTimer = setTimeout(close, 1200);
+    function close(){
+      clearTimeout(autoTimer);
+      el.classList.remove('show');
+      el.onclick = null;
+      document.getElementById('tp-skip').onclick = null;
+      setTimeout(resolve, 320);
+    }
+    // 點任意處 / 點 × 都能 skip
+    el.onclick = close;
+    document.getElementById('tp-skip').onclick = function(e){ e.stopPropagation(); close(); };
+  });
+}
+
+/* 中段社群評論（Q4 答完後插） */
+var midReviews = [
+  {ava:'蔡',color:'#ffd98a',quote:'測完才知道我需要的不是更多保健品，是固定時間吃。',by:'蔡小姐 ・ 32 歲'},
+  {ava:'許',color:'#c8e6a0',quote:'外食族真的有差，喝兩週氣色變好。',by:'許先生 ・ 28 歲'},
+  {ava:'王',color:'#b8c8e8',quote:'睡眠這題戳到了，回家試了一週真的比較好睡。',by:'王小姐 ・ 35 歲'}
+];
+function showMidReview(){
+  var r = midReviews[Math.floor(Math.random()*midReviews.length)];
+  var host = document.getElementById('q-host');
+  var existing = host.querySelector('.mid-review');
+  if(existing) existing.remove();
+  var card = document.createElement('div');
+  card.className = 'mid-review';
+  card.innerHTML =
+    '<div class="mr-ava" style="background:'+r.color+'">'+r.ava+'</div>'+
+    '<div class="mr-body">'+
+      '<div class="mr-stars">★★★★★</div>'+
+      '<div class="mr-quote">「'+r.quote+'」</div>'+
+      '<div class="mr-by">— '+r.by+'</div>'+
+    '</div>';
+  host.appendChild(card);
+}
+
+function startQuiz(){
+  currentQ = 0; answers = {};
+  show('page-quiz');
+  renderQuestion();
+  updateProfile();
+}
+
+/* ═══════════════════════════════════════════════════
+   題目
+   ═══════════════════════════════════════════════════ */
+function renderQuestion(){
+  var q = questions[currentQ], total = questions.length;
+  var pct = Math.round((currentQ+1)/total*100);
+  document.getElementById('pg-fill').style.width = pct+'%';
+  // 進度條文字 = benefit reminder 隨進度切換
+  var benefitText;
+  if(pct < 35) benefitText = '完成可領 $700 購物金';
+  else if(pct < 70) benefitText = '快一半了 ・ $700 在前面等你';
+  else if(pct < 100) benefitText = '快好了 ・ 馬上看到你的配方';
+  else benefitText = '最後一題！';
+  document.getElementById('pg-text').innerHTML = '<span>🎁 '+benefitText+'</span><span><b>'+(currentQ+1)+'</b> / '+total+'</span>';
+  var sel = answers[q.id] || null;
+  var opts = q.options.map(function(o){
+    return '<button class="opt '+(sel===o.value?'sel':'')+'" data-val="'+o.value+'">'+
+      '<span class="opt-icon">'+o.icon+'</span><span>'+o.text+'</span></button>';
+  }).join('');
+  var host = document.getElementById('q-host');
+  host.innerHTML = '<div class="q-card">'+
+    '<span class="q-num">Q'+(currentQ+1)+'</span>'+
+    '<h2 class="q-title">'+q.title+'</h2>'+
+    '<div class="options">'+opts+'</div>'+
+    '<div class="nav-row">'+
+      (currentQ>0?'<button class="btn-back" onclick="prevQ()">上一題</button>':'')+
+      '<button class="btn-next '+(sel?'on':'')+'" id="btn-next">'+(currentQ===total-1?'看我的調理配方 →':'下一題')+'</button>'+
+    '</div></div>';
+
+  host.querySelectorAll('.opt').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      answers[q.id] = this.dataset.val;
+      host.querySelectorAll('.opt').forEach(function(b){ b.classList.remove('sel'); });
+      this.classList.add('sel');
+      document.getElementById('btn-next').classList.add('on');
+      updateProfile();
+    });
+  });
+  document.getElementById('btn-next').addEventListener('click', function(){
+    if(!this.classList.contains('on')) return;
+    var prevQid = q.id, prevVal = answers[q.id];
+    if(currentQ < total-1){
+      currentQ++;
+      maybeEmpathy(prevQid, prevVal);
+      // 主題過場 → 然後渲染題目
+      maybeTopic(currentQ).then(function(){
+        renderQuestion();
+        // Q4 答完進 Q5（idx 4）時，插中段評論
+        if(currentQ === 4) setTimeout(showMidReview, 300);
+      });
+    }
+    else { goAnalyzing(); }
+  });
+}
+
+function prevQ(){ if(currentQ>0){ currentQ--; renderQuestion(); } }
+
+/* ═══════════════════════════════════════════════════
+   優化 1：漸進式檔案
+   ═══════════════════════════════════════════════════ */
+function updateProfile(){
+  // 把答案串成一句話，最後一筆有彈跳動畫
+  var parts = [];
+  ['age','gender','goal','diet','gut','sleep','skin','exercise'].forEach(function(qid){
+    var q = questions.find(function(x){ return x.id===qid; });
+    var v = answers[qid];
+    if(!q||!v) return;
+    var label = q.profile ? q.profile(v) : v;
+    if(label) parts.push(label);
+  });
+  var panel = document.getElementById('sketch');
+  var body = document.getElementById('sketch-body');
+  if(parts.length === 0){
+    panel.classList.add('empty');
+    body.innerHTML = '';
+    return;
+  }
+  panel.classList.remove('empty');
+  // 最後一筆套 new 類別 → 彈跳動畫
+  var html = '<span class="you">';
+  parts.forEach(function(p, i){
+    var isLast = (i === parts.length-1);
+    html += (i>0?' ・ ':'') + '<span class="'+(isLast?'new':'')+'">'+p+'</span>';
+  });
+  html += '</span> 的你';
+  body.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════
+   揭曉前：個人化分析中（讓使用者看到「真的有在分析」）
+   ═══════════════════════════════════════════════════ */
+function goAnalyzing(){
+  show('page-analyzing');
+  // 取使用者畫像關鍵字
+  var ageMap = {teen:'18 歲以下',young:'19-35 歲',middle:'36-55 歲',senior:'55 歲以上'};
+  var goalMap = {slim:'想瘦身',digest:'顧腸胃',energy:'要精神',sleep:'求好眠',beauty:'好氣色',immunity:'強體力'};
+  var who = ageMap[answers.age] + '、' + (answers.gender==='male'?'男生':'女生');
+  var want = goalMap[answers.goal] || '日常保養';
+
+  var lines = [
+    '正在讀你的 8 個答案…',
+    '對應 <span class="key">' + who + '</span> 的狀態',
+    '篩出你在意的 <span class="key">' + want + '</span>',
+    '比對 14 種燈泡菌調理組合…'
+  ];
+  var els = [
+    document.getElementById('ana-1'),
+    document.getElementById('ana-2'),
+    document.getElementById('ana-3'),
+    document.getElementById('ana-4')
+  ];
+  els.forEach(function(e){ e.innerHTML=''; e.classList.remove('show'); });
+
+  lines.forEach(function(text, i){
+    setTimeout(function(){
+      els[i].innerHTML = text;
+      els[i].classList.add('show');
+    }, 600 + i*700);
+  });
+
+  setTimeout(goReveal, 600 + lines.length*700 + 400);
+}
+
+/* ═══════════════════════════════════════════════════
+   揭曉儀式（3 張 3D 翻牌）
+   ═══════════════════════════════════════════════════ */
+
+/* 「被理解」散文（依使用者主訴動態組） */
+function pickEmpathyText(){
+  var code = calculateResult();
+  if(code === 'D11') return '快考試了，你或孩子睡不夠也吃不好。<br>不是不夠努力，是<b>沒辦法一邊讀書一邊照顧自己</b>。<br>身體需要的不是更多咖啡，是穩定的補給。';
+  if(code === 'D12') return '小孩偏食、長得慢、睡不好——做家長的看了會心疼。<br><b>不是你不會照顧，是孩子的身體真的還在找節奏</b>。<br>讓他從吃對開始，慢慢來。';
+  if(code === 'D13') return '長輩什麼都說「我還好」，但你看得出來。<br>膝蓋卡、半夜醒、吃得少——這些都不是大事，但<b>累積起來就是日常的辛苦</b>。<br>能做的不多，從每天一份營養開始最實在。';
+  if(code === 'D14') return '兩個人在一起這麼久，<b>連累的方式都很像了</b>。<br>白天各忙各的，晚上一起累——你想讓你們都好好的。<br>從一起調理開始，比一個人撐著容易。';
+  if(answers.sleep==='poor'||answers.sleep==='stressed'){
+    return '你不是不想休息，是<b>白天沒有人能替你撐這些事</b>。<br>下班滑手機到一兩點，不是你想熬夜，是那段時間才是你的。<br>所以白天累、晚上又睡不好——這不是你太敏感，是你太久沒被照顧了。';
+  }
+  if(answers.diet==='eating_out'||answers.diet==='carbs'){
+    return '外食一兩頓沒事，但吃成生活就累積了。<br><b>你不是不挑食，是太忙了。</b><br>下班連煮一頓飯都覺得是奢侈，更別說什麼營養均衡——你是太懂事，不是不愛自己。';
+  }
+  if(answers.skin==='dull'||answers.skin==='unstable'){
+    return '你也想光鮮亮麗，可是<b>怎麼睡都還是暗沉</b>，化妝也蓋不掉。<br>不是保養品不夠多，是你身體裡面已經喊很久了。<br>它不是要你買新的，是要你聽它說話。';
+  }
+  if(answers.gut!=='normal'){
+    return '早上馬桶坐 10 分鐘，最後還是空手而回。<br>下午脹氣、肚子悶悶的——這不是你想太多。<br><b>是你的腸胃在求救，只是你習慣了。</b>';
+  }
+  if(answers.goal==='slim'){
+    return '你想瘦不是為了好看，是為了<b>讓自己穿衣服輕鬆一點</b>。<br>嘗試過很多方法，餓肚子、戒澱粉、咖啡灌一杯接一杯——都不持久。<br>你需要的不是更狠的減法，是<b>讓身體願意配合你</b>的方式。';
+  }
+  if(answers.exercise==='none'){
+    return '不是你不想動，是<b>下班只剩躺平</b>。<br>身邊的人都在「自律」「健身」「6 點起床跑步」——你看了只覺得累。<br>沒關係，不是每個人都要先運動才能變好，<b>從吃對開始就行。</b>';
+  }
+  return '你今天願意花 3 分鐘做這個測驗，<b>就是一個對自己的善意</b>。<br>很多人連這 3 分鐘都不肯給自己——你已經比他們多走了一步。';
+}
+
+/* 具體痛點句 — 依 D 碼分流（孩童／銀髮／夫妻另寫） */
+function pickPainSentences(){
+  var code = calculateResult();
+  // 考生 / 孩童（家長視角）
+  if(code === 'D11') return [
+    {i:'📚',t:'讀到很晚，第二天還是爬不起來'},
+    {i:'😟',t:'快考試了，胃口反而變差'},
+    {i:'😣',t:'壓力一大，臉色變很差'}
+  ];
+  if(code === 'D12') return [
+    {i:'🥦',t:'青菜挑出來、便當只吃飯和肉'},
+    {i:'📉',t:'這學期感覺長高變慢'},
+    {i:'😪',t:'白天上課沒精神，晚上不肯睡'}
+  ];
+  // 銀髮（自己 / 子女視角）
+  if(code === 'D13') return [
+    {i:'🦴',t:'起床膝蓋有點卡，走久就累'},
+    {i:'😴',t:'半夜常醒，睡眠不夠深'},
+    {i:'🍵',t:'吃得比以前少，怕缺營養'}
+  ];
+  // 夫妻
+  if(code === 'D14') return [
+    {i:'💞',t:'兩個人都累，相處時間反而變少'},
+    {i:'🌙',t:'各自有各自的睡眠問題'},
+    {i:'🌸',t:'想一起把身體照顧好，從哪開始？'}
+  ];
+  // 男性套組
+  if(code === 'D9' || code === 'D10') {
+    var list = [];
+    if(answers.sleep==='poor'||answers.sleep==='stressed') list.push({i:'🌙',t:'熬夜變正常，第二天靠咖啡撐'});
+    if(answers.sleep==='tired') list.push({i:'📉',t:'下午 3 點精神就掉一個檔次'});
+    if(answers.exercise==='regular'||answers.exercise==='intense') list.push({i:'💪',t:'運動有，但恢復速度沒以前快'});
+    if(answers.diet==='eating_out') list.push({i:'🍱',t:'三餐外食，便當吃到自己都膩'});
+    if(answers.gut!=='normal') list.push({i:'😬',t:'肚子悶悶，可是又說不出哪裡不舒服'});
+    if(list.length < 3) list.push({i:'⏰',t:'忙到沒時間照顧自己，是真的'});
+    return list.slice(0,3);
+  }
+  // 一般女性 / 小資女 / 美容類
+  var list = [];
+  if(answers.gut==='constipation') list.push({i:'🚽',t:'早上馬桶坐 10 分鐘，最後還是空手而回'});
+  if(answers.gut==='bloat') list.push({i:'🎈',t:'肚子鼓鼓的，扣得起褲扣但坐下就頂'});
+  if(answers.gut==='sensitive') list.push({i:'😬',t:'吃個小東西就跑廁所，出門前不敢喝水'});
+  if(answers.skin==='dull') list.push({i:'😴',t:'臉色像沒睡飽，化妝也蓋不掉的暗沉'});
+  if(answers.skin==='unstable') list.push({i:'🌧️',t:'今天油、明天乾，保養品搽了像沒搽'});
+  if(answers.sleep==='poor') list.push({i:'🌙',t:'凌晨 1 點還在滑手機，明早 7 點要起床'});
+  if(answers.sleep==='stressed') list.push({i:'😩',t:'人躺著，腦袋還在開會，根本睡不著'});
+  if(answers.sleep==='tired') list.push({i:'📉',t:'下午 3 點就想趴下，咖啡喝越多越累'});
+  if(answers.goal==='slim'&&answers.diet==='carbs') list.push({i:'🍞',t:'看到甜點意志力歸零，吃完又後悔'});
+  if(answers.diet==='eating_out') list.push({i:'🍱',t:'一週外食七天，看著便當想「我這樣對嗎」'});
+  if(answers.skin==='intimate') list.push({i:'💧',t:'某些日子私密處又癢又不舒服，不好意思講'});
+  if(list.length < 3 && answers.exercise==='none') list.push({i:'🛋️',t:'說好下班要去運動，倒在沙發上就忘了'});
+  if(list.length === 0) list.push({i:'💭',t:'說不上來哪裡不對，就是覺得不太對'});
+  return list.slice(0,3);
+}
+
+function goReveal(){
+  show('page-reveal');
+  var code = calculateResult();
+  var r = results[code];
+
+  var empathyText = pickEmpathyText();
+  var pains = pickPainSentences();
+
+  document.getElementById('page-reveal').innerHTML =
+    '<div class="reveal">'+
+    '<p class="reveal-title">先別急著看結果</p>'+
+    '<p class="reveal-sub">三張卡 ・ 點開看看我們認識的你</p>'+
+    '<div class="reveal-cards">'+
+      '<div class="reveal-card tall-mid ready" data-i="0">'+
+        '<div class="face front">'+
+          '<div class="reveal-tap">點開 →</div>'+
+          '<div class="icon-circle">💬</div>'+
+          '<div class="hint">卡 1 ／ 3 ・ 我看到的你</div>'+
+          '<div class="q-text">先別急著看結果<br>有些話想跟你說…</div>'+
+        '</div>'+
+        '<div class="face back">'+
+          '<div class="answer-label">WE SEE YOU</div>'+
+          '<div class="reveal-prose">'+empathyText+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="reveal-card tall locked" data-i="1">'+
+        '<div class="face front">'+
+          '<div class="reveal-tap">點開 →</div>'+
+          '<div class="icon-circle">📋</div>'+
+          '<div class="hint">卡 2 ／ 3 ・ 你最近的日常</div>'+
+          '<div class="q-text">這些事情，是不是<br>最近常常發生？</div>'+
+        '</div>'+
+        '<div class="face back">'+
+          '<div class="answer-label">SOUND FAMILIAR ?</div>'+
+          '<div class="reveal-pains">'+
+            pains.map(function(p){
+              return '<div class="reveal-pain"><span class="reveal-pain-icon">'+p.i+'</span><span class="reveal-pain-text">'+p.t+'</span></div>';
+            }).join('')+
+          '</div>'+
+          '<div class="reveal-closing">這些不是你想太多，是身體在喊你</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="reveal-card final locked" data-i="2">'+
+        '<div class="face front">'+
+          '<div class="reveal-tap">點開 →</div>'+
+          '<div class="icon-circle">💡</div>'+
+          '<div class="hint">卡 3 ／ 3 ・ 揭曉</div>'+
+          '<div class="q-text">所以我們為你<br>準備的調理配方是…</div>'+
+        '</div>'+
+        '<div class="face back">'+
+          '<div class="answer-label">YOUR COMBO</div>'+
+          '<div class="answer-main">'+r.code+'・'+r.name+'</div>'+
+          '<div class="small">點下方按鈕看完整配方</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="reveal-cta-area" id="reveal-cta">'+
+      '<button class="btn-primary" onclick="goResult()">查看我的完整配方</button>'+
+    '</div>'+
+    '</div>';
+
+  // 建議照順序（視覺暗示），但點任一張都能翻
+  var cards = document.querySelectorAll('.reveal-card');
+  var openedSet = new Set();
+  cards.forEach(function(card, idx){
+    card.addEventListener('click', function(){
+      if(card.classList.contains('open')) return;
+      card.classList.add('open');
+      card.classList.remove('ready','locked');
+      openedSet.add(idx);
+      // 視覺：下一張未開的加 ready
+      for(var i=0;i<cards.length;i++){
+        if(!openedSet.has(i) && !cards[i].classList.contains('ready')){
+          cards[i].classList.remove('locked');
+          cards[i].classList.add('ready');
+          break;
+        }
+      }
+      // 全部翻完 → 顯示 CTA
+      if(openedSet.size === cards.length){
+        setTimeout(function(){ document.getElementById('reveal-cta').classList.add('show'); }, 600);
+      }
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   結果頁
+   ═══════════════════════════════════════════════════ */
+var __resultCode = null;
+
+function goResult(){
+  show('page-result');
+  removeWalletHint();
+  var code = calculateResult();
+  __resultCode = code;
+  var r = results[code];
+
+  var pills = r.pills.map(function(p){
+    return '<span class="pill pill-'+p.c+'"><span>'+p.n+'</span><span class="pill-count">'+p.q+'</span></span>';
+  }).join('');
+  var tags = r.tags.map(function(t){ return '<span class="r-tag">#'+t+'</span>'; }).join('');
+
+  // 為什麼是這套（依答案動態生成）
+  var why = [];
+  if(answers.goal==='slim') why.push('你想瘦身控制體態 → 紅燈泡菌幫助控制飲食');
+  if(answers.diet==='carbs') why.push('你愛吃澱粉甜食 → 紫米飲補蛋白增加飽足感');
+  if(answers.gut==='bloat'||answers.gut==='constipation') why.push('你腸胃狀況不太好 → 綠燈泡菌調理腸道');
+  if(answers.sleep==='poor'||answers.sleep==='stressed') why.push('你睡眠或壓力大 → 橙燈泡菌幫助放鬆助眠');
+  if(answers.skin==='dull'||answers.skin==='unstable') why.push('你氣色暗沉 → 藍／紫燈泡菌提亮、補充體力');
+  if(answers.skin==='intimate') why.push('你想加強私密保養 → 靛燈泡菌守護');
+  if(answers.exercise==='regular'||answers.exercise==='intense') why.push('你有規律運動 → 咖啡飲補充能量、加強代謝');
+  if(why.length === 0) why.push('依你的整體狀態，這套是相對均衡的日常配方');
+
+  // 親筆信開頭（依答案組稱呼）
+  var ageMap = {teen:'學生時期',young:'青壯年',middle:'熟齡',senior:'銀髮族'};
+  var goalMap = {slim:'想瘦身',digest:'想顧腸胃',energy:'想要精神',sleep:'想好好睡',beauty:'想氣色好',immunity:'想增強體力'};
+  var youCall = ageMap[answers.age] + '、' + goalMap[answers.goal] + '的你';
+
+  // 模擬社群數字（依結果碼算個假但穩定的數）
+  var socialN = ({D1:1284,D2:2106,D3:967,D4:1532,D5:2418,D6:1789,D7:1452,D8:894,D9:1023,D10:1167,D11:524,D12:683,D13:799,D14:312})[r.code] || 1000;
+
+  // 時間軸 + 工具包
+  var tl = getTimeline(r);
+  var pk = packs[r.code] || {name:r.name+'工具包',tag:'為你準備的調理配方',reason:'依你的答案組成',now:1880,old:2380};
+
+  // 親筆信用的「最在意的事」標籤（從答案重組成短語）
+  var painsLabel = [];
+  if(answers.sleep==='poor'||answers.sleep==='stressed') painsLabel.push('睡眠或壓力');
+  if(answers.gut!=='normal') painsLabel.push('腸胃狀況');
+  if(answers.skin==='dull'||answers.skin==='unstable') painsLabel.push('氣色與肌膚');
+  if(answers.skin==='intimate') painsLabel.push('女性私密保養');
+  if(answers.goal==='slim') painsLabel.push('體態管理');
+  if(answers.exercise==='none') painsLabel.push('運動量');
+  if(painsLabel.length===0) painsLabel = ['日常的整體保養'];
+
+  document.getElementById('page-result').innerHTML =
+    '<div class="result" id="result-host">'+
+      '<div class="r-letter">'+
+        '<div class="salute">給 ・ '+youCall.toUpperCase()+'</div>'+
+        '<div class="you-line">給 <em>'+youCall+'</em>，</div>'+
+        '<div class="body">在你回答的 8 件事裡，我們看到你最在意 '+painsLabel.slice(0,2).join('和')+'。<br>所以我們為你寫下了這個配方，希望它能幫上一點忙。</div>'+
+        '<div class="sign">— MaybeYou 為你寫的</div>'+
+      '</div>'+
+      '<div class="r-card">'+
+        '<span class="r-badge">YOUR DAILY COMBO</span>'+
+        '<h2 class="r-title">'+r.name+'</h2>'+
+        '<p class="r-code">'+r.code+' ｜ '+r.combo+'</p>'+
+        '<p class="r-social">目前有 <b>'+socialN.toLocaleString()+'</b> 位朋友也選了這套</p>'+
+        '<p class="r-combo-label">每日搭配</p>'+
+        '<div class="r-pills">'+pills+'</div>'+
+        '<div class="r-desc">'+r.desc+'</div>'+
+        '<div class="r-tags">'+tags+'</div>'+
+        '<div class="section-h"><div class="bar"></div><span class="t">DAILY ROUTINE</span><span class="t-sub">一天怎麼喝</span></div>'+
+        // 時間軸：什麼時候吃什麼
+        '<div class="timeline">'+
+          '<div class="tl-h">把它變成不用思考的日常</div>'+
+          tl.map(function(t){
+            return '<div class="tl-row">'+
+              '<div class="tl-icon">'+t.icon+'</div>'+
+              '<div class="tl-body">'+
+                '<div class="tl-when">'+t.when+'</div>'+
+                '<div class="tl-what">'+t.what+'</div>'+
+                '<div class="tl-why">'+t.why+'</div>'+
+              '</div>'+
+            '</div>';
+          }).join('')+
+        '</div>'+
+        '<div class="section-h"><div class="bar"></div><span class="t">FOR YOU</span><span class="t-sub">為你準備的工具包</span></div>'+
+        // 工具包定價
+        '<div class="pack">'+
+          '<span class="pack-tag">FOR YOU</span>'+
+          '<div class="pack-name">'+pk.name+'</div>'+
+          '<div class="pack-tagline">'+pk.tag+'</div>'+
+          '<div class="pack-reason">✨ <b>為什麼是這套</b><br>'+pk.reason+'</div>'+
+          '<div class="pack-price">'+
+            '<span class="pack-now">$'+pk.now.toLocaleString()+'</span>'+
+            '<span class="pack-old">$'+pk.old.toLocaleString()+'</span>'+
+            '<span class="pack-save">省 $'+(pk.old-pk.now)+'</span>'+
+          '</div>'+
+        '</div>'+
+        '<div class="section-h"><div class="bar"></div><span class="t">ADD ON</span><span class="t-sub">同類型也加購</span></div>'+
+        // 同類型加購
+        '<div class="addon-row">'+
+          '<div class="addon-h" style="display:none">同類型的朋友也常加購：</div>'+
+          '<label class="addon"><div class="addon-thumb">🥥</div><div class="addon-mid"><div class="addon-name">椰子油 MCT</div><div class="addon-price">$580</div></div><input type="checkbox"></label>'+
+          '<label class="addon"><div class="addon-thumb">🌿</div><div class="addon-mid"><div class="addon-name">舒眠精油棒</div><div class="addon-price">$320</div></div><input type="checkbox"></label>'+
+        '</div>'+
+        '<details class="r-why" style="margin-top:16px"><summary>為什麼推薦這套給你</summary>'+
+          '<div class="why-body"><ul>'+why.map(function(w){return '<li>'+w+'</li>'}).join('')+'</ul></div>'+
+        '</details>'+
+        '<p class="r-keep">🕊️ 我們會為你保留這套配方 <b>7 天</b></p>'+
+        '<button class="btn-cta" onclick="goWallet()">幫我準備這套</button>'+
+        '<button class="btn-ghost" onclick="restart()">重新測驗</button>'+
+      '</div>'+
+    '</div>';
+
+  // 慶祝粒子
+  fireConfetti();
+  // 右下角浮條（只露 500 不露 700）
+  setTimeout(showWalletHint, 1200);
+  // 結果頁底部 sticky CTA（捲到第二屏才出現）
+  showStickyCTA(pk);
+}
+
+function showStickyCTA(pk){
+  var bar = document.getElementById('sticky-cta');
+  document.getElementById('sticky-price').textContent = '$'+pk.now.toLocaleString();
+  document.getElementById('sticky-save').textContent = '省 $'+(pk.old-pk.now);
+  // 捲動到 r-card 下方才出現，避免擋親筆信
+  var lastShown = false;
+  function onScroll(){
+    var should = window.scrollY > 240;
+    if(should !== lastShown){
+      lastShown = should;
+      bar.classList.toggle('show', should);
+    }
+  }
+  window.removeEventListener('scroll', window.__stickyHandler);
+  window.__stickyHandler = onScroll;
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+}
+function hideStickyCTA(){
+  var bar = document.getElementById('sticky-cta');
+  bar.classList.remove('show');
+  if(window.__stickyHandler){ window.removeEventListener('scroll', window.__stickyHandler); window.__stickyHandler = null; }
+}
+
+function pickColor(){
+  var palette = ['#e8a040','#ffd98a','#b8956a','#4caf7a','#7c6dd8','#e05252'];
+  return palette[Math.floor(Math.random()*palette.length)];
+}
+function fireConfetti(){
+  var host = document.getElementById('result-host');
+  if(!host) return;
+  for(var i=0;i<24;i++){
+    var c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.background = pickColor();
+    c.style.left = (Math.random()*100)+'%';
+    c.style.top = '40px';
+    c.style.animation = 'confettiFall '+(1.6+Math.random()*1.2)+'s ease-out '+(Math.random()*.4)+'s forwards';
+    host.appendChild(c);
+    setTimeout(function(el){return function(){el.remove()}}(c), 3500);
+  }
+}
+
+function showWalletHint(){
+  if(document.getElementById('wallet-hint')) return;
+  var el = document.createElement('div');
+  el.id = 'wallet-hint';
+  el.className = 'wallet-hint';
+  el.innerHTML = '💡 你的這套配方可折抵 <b>500 元</b> <span class="wallet-arrow">→</span>';
+  el.onclick = goWallet;
+  document.body.appendChild(el);
+}
+function removeWalletHint(){
+  var el = document.getElementById('wallet-hint');
+  if(el) el.remove();
+}
+
+/* ═══════════════════════════════════════════════════
+   結帳前購物金中繼頁
+   ═══════════════════════════════════════════════════ */
+function goWallet(){
+  removeWalletHint();
+  show('page-wallet');
+  document.getElementById('page-wallet').innerHTML =
+    '<div class="wallet">'+
+      '<div class="wallet-card">'+
+        '<div class="wallet-icon">🎁</div>'+
+        '<p class="wallet-headline">FROM US TO YOU</p>'+
+        '<h2 class="wallet-h">謝謝你陪我們<br>聊完這 8 件事</h2>'+
+        '<p class="wallet-sub">我們準備了一份小心意給你<br>結帳時可以直接折抵</p>'+
+        '<div class="perk">'+
+          '<div class="perk-icon">🎂</div>'+
+          '<div><div class="perk-main">加會員 ・ 填生日</div><div class="perk-sub">生日當週還會再收到一份禮</div></div>'+
+          '<div class="perk-amount">+ 500</div>'+
+        '</div>'+
+        '<div class="perk">'+
+          '<div class="perk-icon">💬</div>'+
+          '<div><div class="perk-main">加官方 LINE</div><div class="perk-sub">新口味、新活動我們先讓你知道</div></div>'+
+          '<div class="perk-amount">+ 200</div>'+
+        '</div>'+
+        '<div class="wallet-total"><span class="label">給你的小心意</span><span class="amt">$700</span></div>'+
+        '<button class="btn-cta" onclick="goReg()">好啊，先領 500 加會員</button>'+
+        '<button class="btn-ghost" onclick="goCart()">先看購物車就好</button>'+
+      '</div>'+
+    '</div>';
+}
+
+/* ═══════════════════════════════════════════════════
+   會員註冊（模擬）
+   ═══════════════════════════════════════════════════ */
+var __memberJoined = false, __lineJoined = false;
+
+function goReg(){
+  show('page-reg');
+  document.getElementById('page-reg').innerHTML =
+    '<div class="reg">'+
+      '<div class="reg-banner">'+
+        '<div class="cake">🎂</div>'+
+        '<div><b>填生日，立刻送 $500</b><small>生日當週還會再送一份禮</small></div>'+
+      '</div>'+
+      '<div class="reg-card">'+
+        '<h2 class="reg-h">加入會員</h2>'+
+        '<p class="reg-sub">3 個欄位・30 秒搞定</p>'+
+        '<div class="field"><label>Email</label><input type="email" placeholder="you@email.com"></div>'+
+        '<div class="field"><label>密碼</label><input type="password" placeholder="至少 8 碼"></div>'+
+        '<div class="field"><label>生日</label><input type="date"><div class="hint-line">🎁 生日當週送你一份小禮</div></div>'+
+        '<button class="btn-cta" onclick="completeReg()">加入會員 ・ 領 $500</button>'+
+        '<button class="btn-ghost" onclick="goCart()">先跳過，直接結帳</button>'+
+      '</div>'+
+    '</div>';
+}
+
+function completeReg(){
+  __memberJoined = true;
+  goLine();
+}
+
+/* ═══════════════════════════════════════════════════
+   LINE 加好友（模擬）
+   ═══════════════════════════════════════════════════ */
+function goLine(){
+  show('page-line');
+  // 假 QR：64 格隨機（每次固定 seed）
+  var qrSeed = [
+    1,1,1,1,1,1,1,1, 1,0,1,1,0,1,0,1, 1,0,1,0,1,0,1,1,
+    1,1,0,1,1,1,0,1, 0,1,1,0,1,0,1,0, 1,0,1,1,1,0,1,1,
+    1,0,1,0,0,1,0,1, 1,1,1,1,1,1,1,1
+  ];
+  var qrHtml = qrSeed.map(function(b){ return '<div class="'+(b?'qr-pixel':'qr-blank')+'"></div>'; }).join('');
+
+  document.getElementById('page-line').innerHTML =
+    '<div class="line">'+
+      '<div class="line-card">'+
+        '<span class="line-success"><span class="check">✓</span> $500 已存入你的帳戶</span>'+
+        '<div class="line-bonus">+ 200 元再領</div>'+
+        '<h2 class="line-h">加 LINE，<em>再多領 $200</em></h2>'+
+        '<p class="line-sub">手機掃 QR ・ 或點下方按鈕<br>加入後系統自動綁定購物金</p>'+
+        '<div class="line-qr">'+qrHtml+'</div>'+
+        '<button class="line-btn" onclick="completeLine()">加入官方 LINE ・ 領 $200</button><br>'+
+        '<button class="btn-ghost" onclick="goCart()">先跳過，去看購物車</button>'+
+      '</div>'+
+    '</div>';
+}
+
+function completeLine(){
+  __lineJoined = true;
+  goCart();
+}
+
+/* ═══════════════════════════════════════════════════
+   購物車（模擬）
+   ═══════════════════════════════════════════════════ */
+function goCart(){
+  show('page-cart');
+  var r = results[__resultCode];
+  var pk = packs[r.code] || {name:r.name+'工具包',now:1880,old:2380};
+
+  var discount = 0;
+  if(__memberJoined) discount += 500;
+  if(__lineJoined) discount += 200;
+  var net = pk.now - discount;
+
+  // 列出工具包內容
+  var pillsDetail = r.pills.map(function(p){ return p.n+' × '+p.q; }).join('、');
+
+  var discountRow = '';
+  if(__memberJoined) discountRow += '<div class="cart-row discount"><span>會員生日購物金</span><span>− $500</span></div>';
+  if(__lineJoined) discountRow += '<div class="cart-row discount"><span>LINE 加好友購物金</span><span>− $200</span></div>';
+  var noDiscountHint = (!__memberJoined && !__lineJoined)
+    ? '<div class="cart-bonus">💡 還沒領購物金？<b>點這裡回去領 700 元</b><br><small style="opacity:.7">加會員 500 + LINE 200</small></div>'
+    : '';
+
+  document.getElementById('page-cart').innerHTML =
+    '<div class="cart">'+
+      '<p class="cart-h">YOUR CART ・ '+pk.name+'</p>'+
+      '<div class="cart-card">'+
+        '<div class="cart-row"><span><b>'+pk.name+'</b> × 1</span><span>$'+pk.now.toLocaleString()+'</span></div>'+
+        '<div style="font-size:12px;color:#888;padding:4px 0 8px;line-height:1.6">包含：'+pillsDetail+'</div>'+
+        (discountRow ? discountRow : '')+
+        '<div class="cart-total"><span>應付金額</span><span>$'+net.toLocaleString()+'</span></div>'+
+      '</div>'+
+      '<div class="cart-remain">🕊️ 為你保留至 <b>'+nextDate(7)+'</b>（7 天）</div>'+
+      (__memberJoined||__lineJoined
+        ? '<div class="cart-bonus">⏰ <b>3 天內結帳</b>，再送一張下次回購 <b>9 折券</b></div>'
+        : noDiscountHint)+
+      '<button class="btn-cta" onclick="alert(\'示範到此，實際結帳會接綠界金流\')">前往結帳</button>'+
+      (!__memberJoined||!__lineJoined ? '<button class="btn-ghost" onclick="goWallet()">回去領剩下的購物金</button>' : '')+
+    '</div>';
+}
+
+function nextDate(days){
+  var d = new Date(Date.now() + days*86400000);
+  return (d.getMonth()+1) + '/' + d.getDate();
+}
+
+/* ═══════════════════════════════════════════════════
+   重新開始
+   ═══════════════════════════════════════════════════ */
+function restart(){
+  currentQ = 0; answers = {}; __resultCode = null;
+  __memberJoined = false; __lineJoined = false;
+  removeWalletHint();
+  updateProfile();
+  show('page-landing');
+}
+</script>
+</body>
+</html>
