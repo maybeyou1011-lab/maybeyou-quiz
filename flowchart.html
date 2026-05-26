@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>燈泡菌測驗 路徑流程圖</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans TC',sans-serif;background:#f8f6f3;color:#2c2c2c;padding:40px 20px;line-height:1.6}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{font-size:28px;margin-bottom:8px}
+  .sub{color:#888;font-size:14px;margin-bottom:28px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:32px;font-size:13px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:14px;height:14px;border-radius:3px;display:inline-block}
+  .col{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px}
+  @media(max-width:760px){.col{grid-template-columns:1fr}}
+  .panel{background:white;border-radius:18px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,.04)}
+  .panel h2{font-size:18px;margin-bottom:14px;border-bottom:2px solid #f0ece6;padding-bottom:10px}
+  .step{position:relative;padding:14px 16px 14px 44px;margin-bottom:10px;border-radius:12px;font-size:14px}
+  .step::before{
+    content:attr(data-n);position:absolute;left:12px;top:14px;
+    width:24px;height:24px;border-radius:50%;background:#2c2c2c;color:white;
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
+  }
+  .step.start{background:#fdfaf5;border:2px solid #efe8de}
+  .step.q{background:#f8f5ee}
+  .step.q::before{background:#b8956a}
+  .step.split{background:#fff7ee;border-left:4px solid #e8a040}
+  .step.split::before{background:#e8a040}
+  .step.result{background:#f0f7ee;border-left:4px solid #4caf7a}
+  .step.result::before{background:#4caf7a}
+  .step.cta{background:#e8f7ee;border-left:4px solid #06c755}
+  .step.cta::before{background:#06c755}
+  .step b{display:block;margin-bottom:4px;font-size:15px}
+  .step small{color:#888;font-size:12px;display:block;margin-top:4px}
+  .arrow{text-align:center;color:#ccc;font-size:20px;margin:-4px 0}
+  .tree{font-size:13px;line-height:1.9;color:#555;background:#fafaf8;padding:16px 20px;border-radius:12px;font-family:monospace;white-space:pre-wrap}
+  .change{background:#fef8f0;border-left:4px solid #d4a82c;padding:14px 18px;border-radius:10px;margin-bottom:10px;font-size:14px}
+  .change b{color:#b8780a}
+  .change s{color:#999}
+  .pill{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;color:white;margin-right:4px}
+  .pill-red{background:#e05252}.pill-orange{background:#e8a040}.pill-yellow{background:#e8d040;color:#555}
+  .pill-green{background:#4caf7a}.pill-blue{background:#4a90d9}.pill-indigo{background:#7c6dd8}
+  .pill-purple{background:#9c5bb5}.pill-coffee{background:#8d6e55}.pill-rice{background:#8b6fc0}.pill-cocoa{background:#6d5243}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid #f0ece6}
+  th{background:#f8f5ee;color:#888;font-weight:500;font-size:12px;letter-spacing:1px}
+  td:first-child{font-weight:700;color:#2c2c2c;width:60px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>燈泡菌測驗 路徑流程圖（v1 優化版）</h1>
+<p class="sub">2026-05-26 更新｜maybeyou1011-lab.github.io/maybeyou-quiz</p>
+
+<div class="legend">
+  <span><i style="background:#efe8de"></i>起點</span>
+  <span><i style="background:#b8956a"></i>單選題</span>
+  <span><i style="background:#e8a040"></i>分流節點</span>
+  <span><i style="background:#4caf7a"></i>結果頁</span>
+  <span><i style="background:#06c755"></i>導購 CTA</span>
+</div>
+
+<div class="col">
+  <div class="panel">
+    <h2>消費者走的路（主流程）</h2>
+
+    <div class="step start" data-n="0"><b>Landing 首頁</b>輪播圖 + 標題「找到專屬你的每日營養搭配」 + 預告「8 題約 1 分鐘」<small>按「開始測驗」進入問卷</small></div>
+    <div class="arrow">↓</div>
+
+    <div class="step q" data-n="1"><b>Q1 性別</b>男 / 女<small>影響 Q7 是否顯示「私密困擾」選項，以及結果分流</small></div>
+    <div class="arrow">↓</div>
+
+    <div class="step q" data-n="2"><b>Q2 年齡層</b>18↓ / 19-35 / 36-55 / 55↑<small>teen → D11/D12，senior → D13（直接定案）</small></div>
+    <div class="arrow">↓</div>
+
+    <div class="step q" data-n="3"><b>Q3 健康目標（核心）</b>瘦 / 消化 / 精神 / 睡眠 / 美容 / 免疫<small>結果分流主軸，搭配後面四題微調</small></div>
+    <div class="arrow">↓</div>
+
+    <div class="step q" data-n="4"><b>Q4 飲食習慣</b>外食 / 愛澱粉 / 均衡 / 健身</div>
+    <div class="arrow">↓</div>
+    <div class="step q" data-n="5"><b>Q5 腸胃狀況</b>脹氣 / 便秘 / 敏感 / 正常</div>
+    <div class="arrow">↓</div>
+    <div class="step q" data-n="6"><b>Q6 睡眠與壓力</b>熬夜 / 壓力 / 疲倦 / 正常</div>
+    <div class="arrow">↓</div>
+    <div class="step q" data-n="7"><b>Q7 肌膚困擾</b>暗沉 / 不穩 / 私密(限女性) / 無<small>男生看不到「私密」選項</small></div>
+    <div class="arrow">↓</div>
+    <div class="step q" data-n="8"><b>Q8 運動習慣</b>不動 / 偶爾 / 規律 / 高強度</div>
+    <div class="arrow">↓</div>
+
+    <div class="step split" data-n="→"><b>Loading 1.8 秒</b>「正在為你分析最佳搭配」<small>同時 POST 答案到 Google Sheet</small></div>
+    <div class="arrow">↓</div>
+
+    <div class="step result" data-n="★"><b>結果頁（D1–D14 其中一組）</b>方案名 + 為什麼推薦給你 + 每日搭配藥丸 + 詳細說明 + 三個適合標籤<small>新版多了「為什麼推薦」灰底框，把答案翻成人話</small></div>
+    <div class="arrow">↓</div>
+
+    <div class="step cta" data-n="$"><b>CTA：加 LINE 領取你的專屬搭配</b>綠色按鈕導向 @maybeyou 官方 LINE<small>舊版是 alert 死路，現在改成 LINE 加好友</small></div>
+  </div>
+
+  <div class="panel">
+    <h2>分流規則樹（calculateResult）</h2>
+
+<div class="tree">if 年齡 = 18 以下
+  ├─ 運動 = 不動/偶爾 → <b>D11 考生調理</b>
+  └─ 其他            → <b>D12 孩童成長</b>
+
+if 年齡 = 55 以上    → <b>D13 銀髮族保健</b>
+
+if 女 且 Q7 = 私密
+  → <b>D6 日夜煥亮</b>  (含靛色私密保養)
+  [舊版會錯丟 D14 夫妻組,已修]
+
+if 男:
+  ├─ 目標 = 免疫 / (精神+規律以上運動) → <b>D10 高富帥</b>
+  ├─ 目標 = 瘦    → <b>D2 閃電輕盈</b>
+  ├─ 目標 = 消化  → <b>D1 消化道</b>
+  ├─ 腸胃有狀況   → <b>D1 消化道</b>   ←新增
+  ├─ 熬夜/壓力大  → <b>D3 新陳代謝</b> ←新增
+  └─ 其他          → <b>D9 精緻男</b>
+
+if 女:
+  ├─ 瘦 + 愛澱粉  → <b>D2 閃電輕盈</b>
+  ├─ 瘦 + 其他    → <b>D4 循環不卡</b>
+  ├─ 消化 + 腸胃正常 → <b>D4 循環不卡</b>
+  ├─ 消化 + 腸胃有狀況 → <b>D1 消化道</b>
+  ├─ 美容 + 暗沉/不穩 + (均衡/規律運動) → <b>D8 白富美</b>
+  ├─ 美容 + 暗沉/不穩            → <b>D6 日夜煥亮</b>
+  ├─ 美容 + 其他                 → <b>D5 活力好氣色</b>
+  ├─ 睡眠 + 氣色暗沉 → <b>D5 活力好氣色</b>
+  ├─ 睡眠 + 其他    → <b>D7 小資女</b>
+  ├─ 精神 + 白天易累 → <b>D3 新陳代謝</b>
+  ├─ 精神 + 其他    → <b>D5 活力好氣色</b>
+  ├─ 免疫 + 規律運動 → <b>D3 新陳代謝</b>
+  ├─ 免疫 + 腸胃不正常 → <b>D4 循環不卡</b>
+  └─ 免疫 + 其他     → <b>D7 小資女</b>
+
+(D14 夫妻調理保留在 results 但不再分流到,改由 LINE 顧問人工推薦)
+</div>
+  </div>
+</div>
+
+<div class="panel" style="margin-bottom:32px">
+  <h2>本次優化改了什麼（共 6 點）</h2>
+
+  <div class="change"><b>① CTA 死路修通</b><br>舊：「立即選購組合」按下去跳 <s>alert('即將為您導向商品頁面!')</s><br>新：改成綠色「加 LINE 領取你的專屬搭配」→ <code>https://line.me/R/ti/p/@maybeyou</code>（CTA_URL 常數，日後可換成燈泡菌 LP）</div>
+
+  <div class="change"><b>② D14 矛盾修正</b><br>舊：女性 + 選「私密困擾」一律推 <s>D14 夫妻生活調理</s>（單身女看到會錯亂）<br>新：女性 + 私密 → D6 日夜煥亮（含靛色私密保養），單身/已婚都合適</div>
+
+  <div class="change"><b>③ Q7「女性私密」對男生隱藏</b><br>renderQuestion 過濾邏輯：男生看 Q7 時自動移除 intimate 選項<br>男生不會再質疑「這測驗是不是只給女生用」</div>
+
+  <div class="change"><b>④ 結果頁拿掉工程師味代號</b><br>舊：「D1 ｜ 紅1 綠1 橙1 可2」（消費者看不懂）<br>新：「適合方案 D1」（代號保留識別性，但細項由下方彩色藥丸呈現「紅燈泡菌 x1」）</div>
+
+  <div class="change"><b>⑤ 加上「為什麼推薦這組給你」</b><br>結果頁多一個米色框：「因為你是 19-35 歲、女性、想瘦身、外食多」<br>用 buildReason() 把答案翻成人話，建立信任感</div>
+
+  <div class="change"><b>⑥ 男性分流不再全部落 D9</b><br>舊：男生只要不選 瘦/消化/免疫，全部歸 D9 精緻男（跟 Q5-Q8 答什麼幾乎無關）<br>新：男生腸胃有狀況 → D1，熬夜/壓力大 → D3，最後才落 D9</div>
+</div>
+
+<div class="panel">
+  <h2>14 套組對照表</h2>
+  <table>
+    <thead><tr><th>代號</th><th>方案名</th><th>主要對象</th><th>每日搭配</th></tr></thead>
+    <tbody>
+      <tr><td>D1</td><td>幫助消化道機能</td><td>腸胃不適、消化不良</td><td><span class="pill pill-red">紅1</span><span class="pill pill-green">綠1</span><span class="pill pill-orange">橙1</span><span class="pill pill-cocoa">可2</span></td></tr>
+      <tr><td>D2</td><td>閃電輕盈</td><td>想瘦身、體態管理</td><td><span class="pill pill-red">紅2</span><span class="pill pill-green">綠1</span><span class="pill pill-rice">米2</span><span class="pill pill-coffee">咖1</span></td></tr>
+      <tr><td>D3</td><td>促進新陳代謝</td><td>精神不濟、循環差</td><td><span class="pill pill-blue">藍1</span><span class="pill pill-indigo">靛1</span><span class="pill pill-yellow">黃1</span><span class="pill pill-coffee">咖1</span><span class="pill pill-cocoa">可1</span></td></tr>
+      <tr><td>D4</td><td>身體循環不卡卡</td><td>外食族、體態維持</td><td><span class="pill pill-red">紅1</span><span class="pill pill-green">綠1</span><span class="pill pill-orange">橙1</span><span class="pill pill-rice">米2</span></td></tr>
+      <tr><td>D5</td><td>活力好氣色</td><td>氣色差、想由內而外</td><td><span class="pill pill-blue">藍1</span><span class="pill pill-green">綠1</span><span class="pill pill-orange">橙1</span><span class="pill pill-rice">米2</span></td></tr>
+      <tr><td>D6</td><td>日夜煥亮</td><td>美白提亮、私密保養</td><td><span class="pill pill-red">紅1</span><span class="pill pill-indigo">靛1</span><span class="pill pill-purple">紫1</span><span class="pill pill-rice">米2</span></td></tr>
+      <tr><td>D7</td><td>小資女調理</td><td>日常基礎保養</td><td><span class="pill pill-red">紅1</span><span class="pill pill-green">綠1</span><span class="pill pill-orange">橙1</span><span class="pill pill-rice">米1</span></td></tr>
+      <tr><td>D8</td><td>白富美保養</td><td>頂級全方位保養</td><td><span class="pill pill-blue">藍1</span><span class="pill pill-indigo">靛1</span><span class="pill pill-orange">橙1</span><span class="pill pill-purple">紫1</span><span class="pill pill-coffee">咖1</span></td></tr>
+      <tr><td>D9</td><td>精緻男調理</td><td>忙碌男性、簡單版</td><td><span class="pill pill-blue">藍1</span><span class="pill pill-orange">橙1</span><span class="pill pill-coffee">咖1</span></td></tr>
+      <tr><td>D10</td><td>高富帥保養</td><td>全面型男、運動族</td><td><span class="pill pill-blue">藍1</span><span class="pill pill-green">綠1</span><span class="pill pill-orange">橙1</span><span class="pill pill-yellow">黃1</span><span class="pill pill-coffee">咖1</span><span class="pill pill-cocoa">可1</span></td></tr>
+      <tr><td>D11</td><td>考生調理</td><td>學生、考生、抗壓</td><td><span class="pill pill-yellow">黃1</span><span class="pill pill-green">綠1</span><span class="pill pill-orange">橙1</span><span class="pill pill-rice">米1</span><span class="pill pill-cocoa">可1</span></td></tr>
+      <tr><td>D12</td><td>孩童成長</td><td>成長期孩童</td><td><span class="pill pill-yellow">黃1</span><span class="pill pill-green">綠1</span><span class="pill pill-orange">橙1</span><span class="pill pill-cocoa">可1</span></td></tr>
+      <tr><td>D13</td><td>銀髮族保健</td><td>55 歲以上長輩</td><td><span class="pill pill-yellow">黃1</span><span class="pill pill-green">綠1</span><span class="pill pill-orange">橙1</span><span class="pill pill-rice">米1</span></td></tr>
+      <tr><td>D14</td><td>夫妻生活調理</td><td>夫妻共同保養（保留方案，不自動分流）</td><td><span class="pill pill-indigo">靛2</span><span class="pill pill-blue">藍2</span><span class="pill pill-green">綠2</span><span class="pill pill-coffee">咖2</span><span class="pill pill-cocoa">可2</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+</div>
+</body>
+</html>
