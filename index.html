@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>燈泡菌測驗已升級｜MaybeYou</title>
-<!-- 301 等效:這份舊測驗(GitHub Pages 靜態)整合進一頁式新站,功能更完整(加購/結帳/發票/優惠碼/訂單後台) -->
-<meta http-equiv="refresh" content="0; url=https://maybeyou-lp-preview.zeabur.app/quiz/bulb-quiz">
-<link rel="canonical" href="https://maybeyou-lp-preview.zeabur.app/quiz/bulb-quiz">
+<title>MaybeYou 美你的事</title>
+<!-- 舊測驗站退役,改導美你的事官方網站。次按鈕保留「直接做測驗購買」通往 /quiz/bulb-quiz -->
+<meta http-equiv="refresh" content="0; url=https://www.maybeyou.cc/">
+<link rel="canonical" href="https://www.maybeyou.cc/">
 <meta name="robots" content="noindex,follow">
 <script>
-  // 帶上原本的 query string,如 ?discount=YA100 仍會生效
-  var target = 'https://maybeyou-lp-preview.zeabur.app/quiz/bulb-quiz' + (location.search || '');
-  location.replace(target);
+  var target = 'https://www.maybeyou.cc/' + (location.search || '');
+  // 留一點點時間讓使用者看到品牌頁面再跳,如果想立即跳就把 setTimeout 拿掉
+  setTimeout(function(){ location.replace(target); }, 1500);
 </script>
 <style>
   body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:#f8f6f3;color:#2c2c2c;
@@ -19,23 +19,26 @@
        min-height:100vh;margin:0;padding:20px;text-align:center}
   .card{background:white;border-radius:18px;padding:36px 28px;max-width:380px;
         box-shadow:0 4px 20px rgba(0,0,0,.05)}
-  .brand{font-size:11px;color:#b8956a;letter-spacing:3px;font-weight:600;margin-bottom:10px}
-  h1{font-size:22px;font-weight:700;margin:0 0 12px}
+  .brand{font-size:11px;color:#b8956a;letter-spacing:3px;font-weight:600;margin-bottom:14px}
+  h1{font-size:22px;font-weight:700;margin:0 0 10px}
   p{font-size:14px;color:#666;line-height:1.7;margin:0 0 22px}
   .spinner{width:36px;height:36px;border:3px solid #f0ece6;border-top-color:#b8956a;
            border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 18px}
   @keyframes spin{to{transform:rotate(360deg)}}
-  a.btn{display:inline-block;background:#2c2c2c;color:white;text-decoration:none;
-        padding:14px 32px;border-radius:50px;font-size:14px;font-weight:600;letter-spacing:1px}
+  a.btn{display:inline-block;text-decoration:none;padding:14px 32px;border-radius:50px;
+        font-size:14px;font-weight:600;letter-spacing:1px;margin:6px 4px}
+  a.btn-primary{background:#2c2c2c;color:white}
+  a.btn-secondary{background:#f5f3ef;color:#888}
 </style>
 </head>
 <body>
   <div class="card">
     <div class="spinner"></div>
-    <div class="brand">MAYBEYOU</div>
-    <h1>測驗已升級</h1>
-    <p>正在帶你前往新版測驗，<br>同時可直接加購與結帳。</p>
-    <a class="btn" href="https://maybeyou-lp-preview.zeabur.app/quiz/bulb-quiz">立即前往</a>
+    <div class="brand">MAYBEYOU 美你的事</div>
+    <h1>正在前往官方網站</h1>
+    <p>更完整的品牌資訊與商品，<br>都在新的官方網站上。</p>
+    <a class="btn btn-primary" href="https://www.maybeyou.cc/">前往官方網站</a><br>
+    <a class="btn btn-secondary" href="https://maybeyou-lp-preview.zeabur.app/quiz/bulb-quiz">直接做測驗購買</a>
   </div>
 </body>
 </html>
