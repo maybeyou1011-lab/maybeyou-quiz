@@ -308,18 +308,17 @@
   .mixn b{color:var(--red)}
   .mixf{font-size:12px;color:var(--muted);margin-top:1px}
 
-  /* 天數方案（30/60/90 天）*/
-  .plans{display:flex;flex-direction:column;gap:10px;margin:14px 0 4px}
-  .plan{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;
-    border:2px solid var(--line);border-radius:16px;padding:13px 15px;background:#fff;transition:all .18s;text-align:left}
-  .plan.sel{border-color:var(--orange);background:#fff8ee;box-shadow:0 6px 18px rgba(245,154,60,.14)}
-  .plan-d{font-size:16px;font-weight:900;display:flex;align-items:center;gap:8px;color:var(--ink)}
-  .plan-tag{font-size:11px;font-weight:700;color:var(--muted);background:var(--bg);padding:2px 9px;border-radius:20px}
-  .plan-tag.best{color:#fff;background:linear-gradient(95deg,var(--orange),var(--red))}
-  .plan-s{font-size:12px;color:var(--muted);margin-top:3px}
-  .plan-r{text-align:right;flex-shrink:0}
-  .plan-now{font-size:19px;font-weight:900;color:var(--red);display:block;line-height:1.1}
-  .plan-old{font-size:12px;color:#bbb;text-decoration:line-through}
+  /* 天數方案：正式方案卡圖片 */
+  .plans{display:flex;flex-direction:column;gap:12px;margin:14px 0 4px}
+  .planimg{position:relative;display:block;width:100%;padding:0;border:3px solid transparent;border-radius:18px;
+    overflow:hidden;background:#fff;cursor:pointer;box-shadow:0 6px 18px rgba(150,110,70,.08);
+    transition:border-color .18s,box-shadow .18s,transform .15s}
+  .planimg img{display:block;width:100%;height:auto}
+  .planimg:active{transform:scale(.99)}
+  .planimg.sel{border-color:var(--orange);box-shadow:0 10px 26px rgba(245,154,60,.22)}
+  .planimg-tag{display:block;padding:9px 12px;font-size:12.5px;font-weight:700;color:var(--muted);
+    background:#fff;border-top:1px solid var(--line)}
+  .planimg.sel .planimg-tag{color:var(--ink)}
 
   /* 回上一題 */
   .q-back{background:none;border:none;color:var(--muted);font-family:inherit;font-size:13.5px;
@@ -541,9 +540,9 @@ var DIM_LABEL={red:'體態與代謝',orange:'睡眠與紓壓',yellow:'骨骼與�
 /* 個人化搭配包方案：一天 4 顆 × 天數 = 總顆數
    ⚠️ 待提供真實定價：下面 now/old 都是佔位數字，拿到正式價目表後直接改這裡 */
 var PLANS=[
-  {key:'d30',days:30,pills:120,now:1580,old:1920,tag:'入門體驗'},
-  {key:'d60',days:60,pills:240,now:2980,old:3840,tag:'最多人選',best:true},
-  {key:'d90',days:90,pills:360,now:3980,old:5760,tag:'最划算・送回購券'}
+  {key:'d15',days:15,pills:60, box:2,now:1980,old:7920, img:'plan2.jpg',tag:'入門體驗'},
+  {key:'d30',days:30,pills:120,box:4,now:3450,old:15840,img:'plan4.jpg',tag:'最多人選',best:true},
+  {key:'d60',days:60,pills:240,box:8,now:5980,old:31680,img:'plan8.jpg',tag:'最划算'}
 ];
 
 /* 7 題計分：每題該色 0-3 分 + 痛點勾選參考(+1.5) + 18 以下成長微調 */
@@ -795,10 +794,9 @@ function goReport(){
 
   // 三個天數方案（一天 4 顆 × 天數）
   var planHtml=PLANS.map(function(p,i){
-    return '<div class="plan'+(i===__plan?' sel':'')+'" data-i="'+i+'" onclick="selectPlan('+i+')">'+
-      '<div class="plan-l"><div class="plan-d">'+p.days+' 天<span class="plan-tag'+(p.best?' best':'')+'">'+p.tag+'</span></div>'+
-        '<div class="plan-s">每天 4 顆 ・ 共 '+p.pills+' 顆</div></div>'+
-      '<div class="plan-r"><span class="plan-now">$'+p.now.toLocaleString()+'</span><span class="plan-old">$'+p.old.toLocaleString()+'</span></div></div>';
+    return '<button class="planimg'+(i===__plan?' sel':'')+'" data-i="'+i+'" onclick="selectPlan('+i+')">'+
+      '<img src="assets/'+p.img+'" alt="'+p.box+' 盒組・'+p.days+' 天" loading="lazy">'+
+      '<span class="planimg-tag">'+p.days+' 天 ・ 每天 4 顆 ・ 共 '+p.pills+' 顆</span></button>';
   }).join('');
 
   document.getElementById('page-report').innerHTML=
