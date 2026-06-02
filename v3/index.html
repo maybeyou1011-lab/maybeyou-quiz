@@ -320,6 +320,14 @@
     background:#fff;border-top:1px solid var(--line)}
   .planimg.sel .planimg-tag{color:var(--ink)}
 
+  /* 購物車：購買組數 */
+  .qty-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;font-weight:600;color:var(--ink)}
+  .qty-ctl{display:flex;align-items:center;gap:16px}
+  .qty-ctl button{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--line);background:#fff;
+    font-size:19px;line-height:1;cursor:pointer;color:var(--ink);display:flex;align-items:center;justify-content:center}
+  .qty-ctl button:active{transform:scale(.9)}
+  .qty-ctl b{min-width:26px;text-align:center;font-size:17px;font-weight:900}
+
   /* 回上一題 */
   .q-back{background:none;border:none;color:var(--muted);font-family:inherit;font-size:13.5px;
     cursor:pointer;padding:0 0 14px;display:inline-block}
@@ -557,24 +565,29 @@ function scoreColors(){
   return s;
 }
 
+/* 可推薦的顏色：18 歲以下（teen）不出紅色（控醣減重）與紫色（美白），不適合小朋友 */
+function availColors(){
+  return answers.age==='teen' ? BULB7.filter(function(c){return c!=='red' && c!=='purple';}) : BULB7;
+}
+
 /* 一天 4 顆：依嚴重度（分數）分配，最該補的色可到 2 顆 */
 function recommendMix(){
-  var s=scoreColors(), qty={}; BULB7.forEach(function(c){qty[c]=0;});
-  var sum=function(){ return BULB7.reduce(function(a,c){return a+qty[c];},0); };
+  var s=scoreColors(), COLS=availColors(), qty={}; COLS.forEach(function(c){qty[c]=0;});
+  var sum=function(){ return COLS.reduce(function(a,c){return a+qty[c];},0); };
   // 第一輪：貪婪取邊際分數最高的色，單色上限 2，只給有需求(>0)的
   for(var k=0;k<4;k++){
     var best=null,bv=-1;
-    BULB7.forEach(function(c){ if(s[c]<=0||qty[c]>=2)return; var v=s[c]/(qty[c]+1); if(v>bv){bv=v;best=c;} });
+    COLS.forEach(function(c){ if(s[c]<=0||qty[c]>=2)return; var v=s[c]/(qty[c]+1); if(v>bv){bv=v;best=c;} });
     if(best) qty[best]++;
   }
   // 補滿 4 顆（有需求的色太少時，放寬上限給分數最高色；全 0 給基礎保養）
   while(sum()<4){
     var best=null,bv=-1;
-    BULB7.forEach(function(c){ if(s[c]<=0)return; if(s[c]>bv){bv=s[c];best=c;} });
-    if(!best){ qty.green=2; qty.red=1; qty.orange=1; break; }
+    COLS.forEach(function(c){ if(s[c]<=0)return; if(s[c]>bv){bv=s[c];best=c;} });
+    if(!best){ qty.green=2; qty.yellow=1; qty.orange=1; break; }
     qty[best]++;
   }
-  var mix=BULB7.filter(function(c){return qty[c]>0;})
+  var mix=COLS.filter(function(c){return qty[c]>0;})
     .map(function(c){return {c:c,q:qty[c],score:s[c]};})
     .sort(function(a,b){ return b.q-a.q || b.score-a.score || BULB7.indexOf(a.c)-BULB7.indexOf(b.c); });
   return {mix:mix, scores:s};
@@ -584,7 +597,7 @@ function recommendMix(){
 function clamp(n){ return Math.max(20, Math.min(98, Math.round(n))); }
 function computeReport(){
   var s=scoreColors();
-  var dims=BULB7.map(function(c){
+  var dims=availColors().map(function(c){
     return {key:c, color:c, label:DIM_LABEL[c], need:clamp(s[c]/4.5*100)};
   });
   var avgNeed=dims.reduce(function(a,d){return a+d.need;},0)/dims.length;
@@ -616,7 +629,7 @@ function show(id){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-var currentQ=0, answers={}, __mix=null, __plan=1, __member=false, __line=false;
+var currentQ=0, answers={}, __mix=null, __plan=1, __qty=1, __member=false, __line=false;
 
 /* 裝飾：登陸頁 7 色燈泡 */
 function paintBulbs(){
@@ -954,10 +967,11 @@ function goCart(){
   show('page-cart');
   var p=PLANS[__plan], mix=__mix||[];
   var packName='個人化七色搭配包 '+p.days+'天';
+  var subtotal=p.now*__qty;
   var disc=0; if(__member)disc+=500; if(__line)disc+=200;
-  var net=Math.max(0,p.now-disc);
-  // 明細：每色總顆數 = 一天顆數 × 天數
-  var pillsDetail=mix.map(function(m){return BULB[m.c].n+' × '+(m.q*p.days)+' 顆';}).join('、');
+  var net=Math.max(0,subtotal-disc);
+  // 明細：每色總顆數 = 一天顆數 × 天數 × 組數
+  var pillsDetail=mix.map(function(m){return BULB[m.c].n+' × '+(m.q*p.days*__qty)+' 顆';}).join('、');
   var discRow='';
   if(__member)discRow+='<div class="crow disc"><span>會員生日購物金</span><span>− $500</span></div>';
   if(__line)discRow+='<div class="crow disc"><span>LINE 加好友購物金</span><span>− $200</span></div>';
@@ -967,8 +981,10 @@ function goCart(){
     '<div class="pad">'+
       '<div class="h-kicker">YOUR CART ・ '+packName+'</div>'+
       '<div class="cart-card">'+
-        '<div class="crow"><span><b>'+packName+'</b> × 1</span><span>$'+p.now.toLocaleString()+'</span></div>'+
-        '<div style="font-size:12px;color:#8a8794;padding:4px 0 6px;line-height:1.6">每天 4 顆 ・ 共 '+p.pills+' 顆｜'+pillsDetail+'</div>'+
+        '<div class="crow"><span><b>'+packName+'</b></span><span>$'+p.now.toLocaleString()+' / 組</span></div>'+
+        '<div style="font-size:12px;color:#8a8794;padding:4px 0 6px;line-height:1.6">每組每天 4 顆 ・ '+p.box+' 盒｜'+pillsDetail+'</div>'+
+        '<div class="qty-row"><span>購買組數</span><div class="qty-ctl"><button type="button" onclick="changeQty(-1)" aria-label="減少組數">−</button><b>'+__qty+'</b><button type="button" onclick="changeQty(1)" aria-label="增加組數">＋</button></div></div>'+
+        '<div class="crow"><span>小計（'+__qty+' 組）</span><span>$'+subtotal.toLocaleString()+'</span></div>'+
         discRow+
         '<div class="ctotal"><span>應付金額</span><span>$'+net.toLocaleString()+'</span></div>'+
       '</div>'+
@@ -983,9 +999,10 @@ function goCheckout(){
   if(CONFIG.checkoutUrl){ window.location.href=CONFIG.checkoutUrl; }
   else { alert('示範到此 ・ 設定 CONFIG.checkoutUrl 後即可接綠界金流結帳'); }
 }
+function changeQty(d){ __qty=Math.max(1,Math.min(99,__qty+d)); goCart(); }
 function nextDate(days){ var d=new Date(Date.now()+days*86400000); return (d.getMonth()+1)+'/'+d.getDate(); }
 
-function restart(){ currentQ=0; answers={}; __mix=null; __plan=1; __member=false; __line=false; show('page-landing'); }
+function restart(){ currentQ=0; answers={}; __mix=null; __plan=1; __qty=1; __member=false; __line=false; show('page-landing'); }
 
 /* confetti keyframes（用 JS 注入，避免 CSS 太長）*/
 var st=document.createElement('style');
