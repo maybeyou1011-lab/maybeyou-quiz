@@ -593,6 +593,54 @@ function recommendMix(){
   return {mix:mix, scores:s};
 }
 
+/* ═══════════════════════════════════════════════════
+   真實銷售套組（後台用名稱，前台不露出）
+   每組 = 30 天 / 120 顆 / 4 盒，recipe = 30 天各色總顆數
+   main = 該組主色，對應測驗中最在意的那一色
+   ═══════════════════════════════════════════════════ */
+var COMBOS=[
+  {key:'sleep',   name:'深層好睡組',     main:'orange', recipe:{red:0, orange:50,yellow:20,green:30,blue:10,indigo:10,purple:0}},
+  {key:'kid',     name:'孩童長高高組',   main:'yellow', recipe:{red:5, orange:0, yellow:45,green:35,blue:25,indigo:0, purple:10}},
+  {key:'beauty',  name:'日夜煥亮美白組', main:'purple', recipe:{red:15,orange:0, yellow:10,green:35,blue:0, indigo:25,purple:35}},
+  {key:'intimate',name:'私密呵護組',     main:'indigo', recipe:{red:15,orange:0, yellow:0, green:35,blue:10,indigo:40,purple:20}}
+];
+function comboBy(key){ return COMBOS.filter(function(c){return c.key===key;})[0]; }
+
+/* 對應規則：依「最在意的主色」挑套組
+   靛→私密呵護、黃(或未成年)→孩童長高高、橙→深層好睡、紫→日夜煥亮美白
+   若最高需求落在紅/綠/藍(非四組主色)，退而取配方相似度最近的那組 */
+function matchCombo(){
+  var s=scoreColors();
+  if(answers.age==='teen') return comboBy('kid'); // 未成年直接走成長組
+  var mainKeys={orange:'sleep',yellow:'kid',purple:'beauty',indigo:'intimate'};
+  var order=BULB7.slice().sort(function(a,b){return s[b]-s[a];});
+  for(var i=0;i<order.length;i++){
+    if(mainKeys[order[i]] && s[order[i]]>0) return comboBy(mainKeys[order[i]]);
+  }
+  // 全部主色都 0：用相似度(內積)挑最接近的
+  var best=COMBOS[0], bv=-1;
+  COMBOS.forEach(function(c){
+    var dot=BULB7.reduce(function(a,k){return a+(s[k]||0)*(c.recipe[k]||0);},0);
+    if(dot>bv){ bv=dot; best=c; }
+  });
+  return best;
+}
+
+/* 把 30 天套組配方換算成「每天 4 顆」的代表性搭配(最大餘數法分配) */
+function dailyFromRecipe(recipe){
+  var per={}, floorSum=0, rem=[];
+  BULB7.forEach(function(k){
+    var v=(recipe[k]||0)/30; per[k]=Math.floor(v); floorSum+=per[k];
+    rem.push({k:k, r:v-Math.floor(v), v:v});
+  });
+  var need=4-floorSum;
+  rem.sort(function(a,b){return b.r-a.r;});
+  for(var i=0;i<need;i++){ if(rem[i] && rem[i].v>0) per[rem[i].k]++; }
+  return BULB7.filter(function(k){return per[k]>0;})
+    .map(function(k){return {c:k, q:per[k]};})
+    .sort(function(a,b){return b.q-a.q || BULB7.indexOf(a.c)-BULB7.indexOf(b.c);});
+}
+
 /* 報告：7 色需求度（分數越高＝越該補）＋ 整體健康指數 */
 function clamp(n){ return Math.max(20, Math.min(98, Math.round(n))); }
 function computeReport(){
@@ -764,7 +812,9 @@ function gradeOf(score){
 }
 function goReport(){
   show('page-report');
-  var rec=recommendMix(); var mix=rec.mix; __mix=mix;
+  // 依測驗對應到真實套組(前台不露名稱),用該組配方換算每日搭配
+  var combo=matchCombo(); window.__combo=combo;
+  var mix=dailyFromRecipe(combo.recipe); __mix=mix;
   var rep=computeReport();
   var grade=gradeOf(rep.overall);
   var circ=Math.round(2*Math.PI*52); // 半徑 52 的圓周長
@@ -796,12 +846,16 @@ function goReport(){
       selPains.map(function(p){var cc=COLORS[p.color];return '<span class="need-pill"><span class="nd" style="background:'+cc+';color:'+cc+'"></span>'+p.label+'</span>';}).join('')+
     '</div></div>' : '';
 
-  // 個人化一天四顆搭配
-  var totalQ=mix.reduce(function(a,m){return a+m.q;},0);
-  var mixPills=mix.map(function(m){return '<span class="pill" style="background:'+COLORS[m.c]+'">'+BULB[m.c].n+'<span class="cnt">'+m.q+'</span></span>';}).join('');
-  var mixList=mix.map(function(m){
+  // 未來 30 天的專屬配方（各色 30 天總顆數，不同套組顯示不同，前台不露套組名）
+  var recipe30=BULB7.filter(function(k){return (combo.recipe[k]||0)>0;})
+    .map(function(k){return {c:k, q:combo.recipe[k]};})
+    .sort(function(a,b){return b.q-a.q || BULB7.indexOf(a.c)-BULB7.indexOf(b.c);});
+  var totalQ=mix.reduce(function(a,m){return a+m.q;},0); // 每天顆數(=4)
+  var total30=recipe30.reduce(function(a,m){return a+m.q;},0); // 30 天總顆數(=120)
+  var mixPills=recipe30.map(function(m){return '<span class="pill" style="background:'+COLORS[m.c]+'">'+BULB[m.c].n+'<span class="cnt">'+m.q+'</span></span>';}).join('');
+  var mixList=recipe30.map(function(m){
     return '<div class="mixrow"><span class="nd" style="background:'+COLORS[m.c]+';color:'+COLORS[m.c]+'"></span>'+
-      '<div class="mixb"><div class="mixn">'+BULB[m.c].n+' <b>× '+m.q+' 顆</b></div><div class="mixf">'+BULB[m.c].fn+'</div></div></div>';
+      '<div class="mixb"><div class="mixn">'+BULB[m.c].n+' <b>× '+m.q+' 顆</b><span style="color:var(--muted);font-weight:500"> / 30 天</span></div><div class="mixf">'+BULB[m.c].fn+'</div></div></div>';
   }).join('');
 
   // 一天怎麼吃（早/午/晚）
@@ -837,13 +891,13 @@ function goReport(){
 
       chosenHtml+
 
-      // 個人化一天四顆搭配
-      '<div class="card combo-card"><span class="combo-tag">為你配的一天四顆</span>'+
-        '<div class="combo-name">個人化七色搭配</div>'+
-        '<div class="combo-code">每天 '+totalQ+' 顆 ・ 依需求嚴重度分配</div>'+
+      // 未來 30 天專屬配方（前台只露個人化配方，不露套組名稱）
+      '<div class="card combo-card"><span class="combo-tag">為你配的專屬配方</span>'+
+        '<div class="combo-name">未來 30 天・個人化七色搭配</div>'+
+        '<div class="combo-code">每天 '+totalQ+' 顆 ・ 30 天共 '+total30+' 顆 ・ 依你的檢測客製</div>'+
         '<div class="pills">'+mixPills+'</div>'+
         '<div class="mixlist">'+mixList+'</div>'+
-        '<div class="tl-h">🕐 一天怎麼吃（變成不用想的日常）</div>'+tlHtml+'</div>'+
+        '<div class="tl-h">🗓️ 未來 30 天這樣吃（每天的節奏）</div>'+tlHtml+'</div>'+
 
       // 天數方案
       '<div class="card pack"><div class="combo-tag" style="background:linear-gradient(95deg,'+COLORS.green+','+COLORS.blue+')">FOR YOU ・ 選你的份量</div>'+
