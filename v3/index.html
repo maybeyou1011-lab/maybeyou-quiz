@@ -622,20 +622,21 @@ function recommendMix(){
    main = 該組主色，對應測驗中最在意的那一色
    ═══════════════════════════════════════════════════ */
 var COMBOS=[
-  {key:'sleep',   name:'深層好睡組',     main:'orange', recipe:{red:0, orange:50,yellow:20,green:30,blue:10,indigo:10,purple:0}},
-  {key:'kid',     name:'孩童長高高組',   main:'yellow', recipe:{red:5, orange:0, yellow:45,green:35,blue:25,indigo:0, purple:10}},
-  {key:'beauty',  name:'日夜煥亮美白組', main:'purple', recipe:{red:15,orange:0, yellow:10,green:35,blue:0, indigo:25,purple:35}},
-  {key:'intimate',name:'私密呵護組',     main:'indigo', recipe:{red:15,orange:0, yellow:0, green:35,blue:10,indigo:40,purple:20}}
+  {key:'sleep',   name:'深層好睡組',   main:'orange', recipe:{red:0, orange:40,yellow:30,green:20,blue:10,indigo:10,purple:10}},
+  {key:'kid',     name:'孩童長高高組', main:'yellow', recipe:{red:0, orange:0, yellow:42,green:35,blue:32,indigo:11,purple:0}},
+  {key:'beauty',  name:'日夜煥亮組',   main:'purple', recipe:{red:8, orange:8, yellow:12,green:20,blue:14,indigo:19,purple:39}},
+  {key:'intimate',name:'私密呵護組',   main:'indigo', recipe:{red:6, orange:9, yellow:3, green:25,blue:14,indigo:36,purple:27}},
+  {key:'slim',    name:'瘦身輕盈組',   main:'red',    recipe:{red:41,orange:6, yellow:15,green:24,blue:16,indigo:11,purple:7}}
 ];
 function comboBy(key){ return COMBOS.filter(function(c){return c.key===key;})[0]; }
 
 /* 對應規則：依「最在意的主色」挑套組
-   靛→私密呵護、黃(或未成年)→孩童長高高、橙→深層好睡、紫→日夜煥亮美白
-   若最高需求落在紅/綠/藍(非四組主色)，退而取配方相似度最近的那組 */
+   紅→瘦身輕盈、靛→私密呵護、黃(或未成年)→孩童長高高、橙→深層好睡、紫→日夜煥亮
+   若最高需求落在綠/藍(非主色)，退而取配方相似度最近的那組 */
 function matchCombo(){
   var s=scoreColors();
   if(answers.age==='teen') return comboBy('kid'); // 未成年直接走成長組
-  var mainKeys={orange:'sleep',yellow:'kid',purple:'beauty',indigo:'intimate'};
+  var mainKeys={red:'slim',orange:'sleep',yellow:'kid',purple:'beauty',indigo:'intimate'};
   var order=BULB7.slice().sort(function(a,b){return s[b]-s[a];});
   for(var i=0;i<order.length;i++){
     if(mainKeys[order[i]] && s[order[i]]>0) return comboBy(mainKeys[order[i]]);
