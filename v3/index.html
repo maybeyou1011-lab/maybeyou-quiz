@@ -421,9 +421,32 @@ var CONFIG = {
   // 美你的事官方 LINE（燈泡菌走 @maybeyou，別跟心學院 @462nsdht 混用）
   lineUrl: 'https://line.me/R/ti/p/@maybeyou',
   // ⚠️ 結帳網址：填了「前往結帳」就會導過去；留空＝示範彈窗
-  checkoutUrl: ''
+  checkoutUrl: '',
+  // 後台追蹤：把作答+對應套組送進一頁式後台(QuizSession)，後台 /admin/quiz 看分布
+  trackUrl: 'https://maybeyou-lp-preview.zeabur.app/api/quiz/track',
+  shopSlug: 'bulb-quiz-v3'
   // ⚠️ 工具包價格（packs 的 now/old）目前是佔位數字，待提供真實定價後一次替換
 };
+
+/* 後台追蹤(fire-and-forget,失敗絕不擋使用者)：
+   start = 按開始測驗、complete = 做到結果頁(帶對應套組名給後台分布) */
+var __sessionId=null;
+function trackQuiz(action, combo){
+  if(!CONFIG.trackUrl) return;
+  try{
+    var body={ shopSlug:CONFIG.shopSlug, action:action };
+    if(action==='complete'){
+      body.sessionId=__sessionId;
+      body.resultCode=combo ? combo.name : null;   // 後台「結果分布」就是用這個分組
+      body.answers={ answers:answers, scores:scoreColors(), comboKey:combo?combo.key:null };
+    }
+    fetch(CONFIG.trackUrl,{ method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body), keepalive:true })
+      .then(function(r){return r.json();})
+      .then(function(d){ if(action==='start' && d && d.sessionId) __sessionId=d.sessionId; })
+      .catch(function(){});
+  }catch(e){}
+}
 
 /* 7 色色票（對應 CSS 變數）*/
 var COLORS = {
@@ -691,7 +714,7 @@ function paintBulbs(){
   }).join('');
 }
 
-function startQuiz(){ currentQ=0; answers={}; show('page-quiz'); renderQuestion(); }
+function startQuiz(){ currentQ=0; answers={}; __sessionId=null; trackQuiz('start'); show('page-quiz'); renderQuestion(); }
 
 /* ── 進度條（8 段，依當前題主色上色）── */
 function renderSegs(){
@@ -815,6 +838,7 @@ function goReport(){
   // 依測驗對應到真實套組(前台不露名稱),用該組配方換算每日搭配
   var combo=matchCombo(); window.__combo=combo;
   var mix=dailyFromRecipe(combo.recipe); __mix=mix;
+  trackQuiz('complete', combo);  // 把對應套組送進一頁式後台
   var rep=computeReport();
   var grade=gradeOf(rep.overall);
   var circ=Math.round(2*Math.PI*52); // 半徑 52 的圓周長
