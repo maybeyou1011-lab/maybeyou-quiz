@@ -629,7 +629,11 @@ function show(id){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-var currentQ=0, answers={}, __mix=null, __plan=1, __qty=1, __member=false, __line=false;
+var currentQ=0, answers={}, __mix=null, __qtys=[0,0,0], __member=false, __line=false;
+// 各方案獨立組數的小工具:總價、總折扣、總組數
+function planTotal(){ return PLANS.reduce(function(s,p,i){return s+p.now*(__qtys[i]||0);},0); }
+function planSave(){ return PLANS.reduce(function(s,p,i){return s+(p.old-p.now)*(__qtys[i]||0);},0); }
+function groupsTotal(){ return __qtys.reduce(function(s,q){return s+(q||0);},0); }
 
 /* 裝飾：登陸頁 7 色燈泡 */
 function paintBulbs(){
@@ -764,7 +768,8 @@ function goReport(){
   var rep=computeReport();
   var grade=gradeOf(rep.overall);
   var circ=Math.round(2*Math.PI*52); // 半徑 52 的圓周長
-  __plan=PLANS.reduce(function(bi,p,i){return p.best?i:bi;},1); // 預設選「最多人選」方案
+  // 預設給「最多人選」那組 1 組,其他 0(使用者可各別加減)
+  __qtys=PLANS.map(function(p){return p.best?1:0;});
 
   var ageMap={teen:'18 歲以下',adult:'18 歲以上'};
   var youCall=(ageMap[answers.age]||'')+'・想好好照顧自己的你';
@@ -807,9 +812,10 @@ function goReport(){
 
   // 三個天數方案（一天 4 顆 × 天數）
   var planHtml=PLANS.map(function(p,i){
-    return '<button class="planimg'+(i===__plan?' sel':'')+'" data-i="'+i+'" onclick="selectPlan('+i+')">'+
+    return '<div class="planimg'+((__qtys[i]||0)>0?' sel':'')+'" data-i="'+i+'">'+
       '<img src="assets/'+p.img+'" alt="'+p.box+' 盒組・'+p.days+' 天" loading="lazy">'+
-      '<span class="planimg-tag">'+p.days+' 天 ・ 每天 4 顆 ・ 共 '+p.pills+' 顆</span></button>';
+      '<span class="planimg-tag">'+p.days+' 天 ・ 每天 4 顆 ・ 共 '+p.pills+' 顆</span>'+
+      '<div class="qty-row" style="padding:10px 12px;border-bottom:none"><span>組數</span><div class="qty-ctl"><button type="button" onclick="changePlanQty('+i+',-1)" aria-label="減少組數">−</button><b id="pq-'+i+'">'+(__qtys[i]||0)+'</b><button type="button" onclick="changePlanQty('+i+',1)" aria-label="增加組數">＋</button></div></div></div>';
   }).join('');
 
   document.getElementById('page-report').innerHTML=
@@ -844,6 +850,7 @@ function goReport(){
         '<div class="pack-name">你的專屬搭配包</div>'+
         '<div class="pack-tag">同一組配方，選要吃多久；天數越長越優惠</div>'+
         '<div class="plans">'+planHtml+'</div>'+
+        '<div class="crow" style="padding-top:10px;margin-top:6px;border-top:1px solid var(--line)"><span>小計（共 <span id="rep-qtytxt">'+groupsTotal()+'</span> 組）</span><span id="rep-subtotal">$'+planTotal().toLocaleString()+'</span></div>'+
         '<div class="price-hold">🕊️ 為你保留這組配方 7 天</div>'+
         '<button class="btn btn-lg btn-rainbow" style="margin-top:16px" onclick="goWallet()">幫我準備這套</button>'+
         '<button class="btn btn-ghost" onclick="restart()">重新檢測</button></div>'+
@@ -857,11 +864,19 @@ function goReport(){
   showSticky();
 }
 
-/* 切換天數方案（更新選取狀態 + sticky 價格）*/
-function selectPlan(i){
-  __plan=i;
-  document.querySelectorAll('.plan').forEach(function(el){ el.classList.toggle('sel', +el.dataset.i===i); });
+/* 各方案獨立加減組數（每一項都能自己選）*/
+function changePlanQty(i,d){
+  __qtys[i]=Math.max(0,Math.min(99,(__qtys[i]||0)+d));
+  var b=document.getElementById('pq-'+i); if(b)b.textContent=__qtys[i];
+  var card=document.querySelector('.planimg[data-i="'+i+'"]'); if(card)card.classList.toggle('sel',__qtys[i]>0);
+  syncReportPrice();
   showSticky();
+}
+
+/* 同步報告頁的「小計（共 N 組）」顯示 */
+function syncReportPrice(){
+  var qt=document.getElementById('rep-qtytxt'); if(qt)qt.textContent=groupsTotal();
+  var st=document.getElementById('rep-subtotal'); if(st)st.textContent='$'+planTotal().toLocaleString();
 }
 
 function animateGauge(target, circ, color){
@@ -890,9 +905,9 @@ function fireConfetti(){
 
 /* sticky 結帳 bar */
 function showSticky(){
-  var p=PLANS[__plan], bar=document.getElementById('sticky-bar');
-  document.getElementById('sb-now').textContent='$'+p.now.toLocaleString();
-  document.getElementById('sb-save').textContent='省 $'+(p.old-p.now);
+  var bar=document.getElementById('sticky-bar');
+  document.getElementById('sb-now').textContent='$'+planTotal().toLocaleString();
+  document.getElementById('sb-save').textContent='省 $'+planSave().toLocaleString();
   var last=false;
   function onScroll(){ var s=window.scrollY>260; if(s!==last){last=s;bar.classList.toggle('show',s);} }
   window.removeEventListener('scroll',window.__sb); window.__sb=onScroll;
@@ -965,29 +980,42 @@ function completeLine(){ __line=true; if(CONFIG.lineUrl) window.open(CONFIG.line
 /* 購物車（模擬）*/
 function goCart(){
   show('page-cart');
-  var p=PLANS[__plan], mix=__mix||[];
-  var packName='個人化七色搭配包 '+p.days+'天';
-  var subtotal=p.now*__qty;
-  var disc=0; if(__member)disc+=500; if(__line)disc+=200;
-  var net=Math.max(0,subtotal-disc);
-  // 明細：每色總顆數 = 一天顆數 × 天數 × 組數
-  var pillsDetail=mix.map(function(m){return BULB[m.c].n+' × '+(m.q*p.days*__qty)+' 顆';}).join('、');
+  var mix=__mix||[];
+  var lines=PLANS.map(function(p,i){return {p:p,i:i,q:__qtys[i]||0};}).filter(function(x){return x.q>0;});
+  var subtotal=planTotal();
+  var SHIP_FEE=300, FREE_AT=3000;            // 運費 $300,滿 $3,000 免運
+  var shipFee=subtotal>=FREE_AT?0:SHIP_FEE;
+  // 生日 $500、加 LINE $200、折價券都是「下單後入帳、下次回購才折抵」,一律不扣這次
+  var earned=0; if(__member)earned+=500; if(__line)earned+=200;
+  var net=subtotal+shipFee;                  // 應付 = 商品小計 + 運費(折價券/購物金本次都不折抵)
   var discRow='';
-  if(__member)discRow+='<div class="crow disc"><span>會員生日購物金</span><span>− $500</span></div>';
-  if(__line)discRow+='<div class="crow disc"><span>LINE 加好友購物金</span><span>− $200</span></div>';
+  if(__member)discRow+='<div class="crow disc"><span>會員生日購物金</span><span>+ $500・下次回購折抵</span></div>';
+  if(__line)discRow+='<div class="crow disc"><span>LINE 加好友購物金</span><span>+ $200・下次回購折抵</span></div>';
   var noDisc=(!__member&&!__line)?'<div class="curge">💡 還沒領購物金？<b>點下方回去領 700 元</b></div>':'';
+
+  // 每個有選組數的方案各一段明細(顆數 = 一天顆數 × 天數 × 該方案組數),每段自帶組數加減
+  var itemRows=lines.length===0
+    ? '<div class="crow"><span>尚未選擇組數</span><span>—</span></div>'
+    : lines.map(function(x){
+        var pillsDetail=mix.map(function(m){return BULB[m.c].n+' × '+(m.q*x.p.days*x.q)+' 顆';}).join('、');
+        return '<div class="crow"><span><b>個人化七色搭配包 '+x.p.days+'天</b></span><span>$'+x.p.now.toLocaleString()+' / 組</span></div>'+
+          '<div style="font-size:12px;color:#8a8794;padding:4px 0 6px;line-height:1.6">每組每天 4 顆 ・ '+x.p.box+' 盒｜'+pillsDetail+'</div>'+
+          '<div class="qty-row"><span>組數</span><div class="qty-ctl"><button type="button" onclick="changeCartQty('+x.i+',-1)" aria-label="減少組數">−</button><b>'+x.q+'</b><button type="button" onclick="changeCartQty('+x.i+',1)" aria-label="增加組數">＋</button></div></div>'+
+          '<div class="crow" style="border-bottom:none"><span style="color:#8a8794">小計</span><span>$'+(x.p.now*x.q).toLocaleString()+'</span></div>';
+      }).join('');
 
   document.getElementById('page-cart').innerHTML=
     '<div class="pad">'+
-      '<div class="h-kicker">YOUR CART ・ '+packName+'</div>'+
+      '<div class="h-kicker">YOUR CART ・ 個人化七色搭配包</div>'+
       '<div class="cart-card">'+
-        '<div class="crow"><span><b>'+packName+'</b></span><span>$'+p.now.toLocaleString()+' / 組</span></div>'+
-        '<div style="font-size:12px;color:#8a8794;padding:4px 0 6px;line-height:1.6">每組每天 4 顆 ・ '+p.box+' 盒｜'+pillsDetail+'</div>'+
-        '<div class="qty-row"><span>購買組數</span><div class="qty-ctl"><button type="button" onclick="changeQty(-1)" aria-label="減少組數">−</button><b>'+__qty+'</b><button type="button" onclick="changeQty(1)" aria-label="增加組數">＋</button></div></div>'+
-        '<div class="crow"><span>小計（'+__qty+' 組）</span><span>$'+subtotal.toLocaleString()+'</span></div>'+
+        itemRows+
+        '<div class="crow" style="border-top:1px solid var(--line);padding-top:10px"><span><b>小計（共 '+groupsTotal()+' 組）</b></span><span>$'+subtotal.toLocaleString()+'</span></div>'+
+        '<div class="crow"><span>運費'+(shipFee===0?'（滿 $3,000 免運）':'（未滿 $3,000）')+'</span><span>'+(shipFee===0?'免運':'$'+shipFee)+'</span></div>'+
         discRow+
         '<div class="ctotal"><span>應付金額</span><span>$'+net.toLocaleString()+'</span></div>'+
       '</div>'+
+      (shipFee>0?'<div class="curge">🚚 再買 <b>$'+(FREE_AT-subtotal).toLocaleString()+'</b> 元（約再 1 組）即可<b>免運</b></div>':'')+
+      (earned>0?'<div class="cnote">🎁 完成這筆訂單後 <b>$'+earned+'</b> 購物金入帳・購物金與折價券皆為下次回購折抵，本次不折抵</div>':'<div class="cnote">🎟️ 購物金與折價券皆為下次回購折抵，本次不折抵</div>')+
       '<div class="cnote">🕊️ 為你保留至 '+nextDate(7)+'（7 天）</div>'+
       (__member||__line?'<div class="curge">⏰ <b>3 天內結帳</b>，再送一張下次回購 <b>9 折券</b></div>':noDisc)+
       '<button class="btn btn-lg btn-rainbow" onclick="goCheckout()">前往結帳</button>'+
@@ -999,10 +1027,10 @@ function goCheckout(){
   if(CONFIG.checkoutUrl){ window.location.href=CONFIG.checkoutUrl; }
   else { alert('示範到此 ・ 設定 CONFIG.checkoutUrl 後即可接綠界金流結帳'); }
 }
-function changeQty(d){ __qty=Math.max(1,Math.min(99,__qty+d)); goCart(); }
+function changeCartQty(i,d){ __qtys[i]=Math.max(0,Math.min(99,(__qtys[i]||0)+d)); goCart(); }
 function nextDate(days){ var d=new Date(Date.now()+days*86400000); return (d.getMonth()+1)+'/'+d.getDate(); }
 
-function restart(){ currentQ=0; answers={}; __mix=null; __plan=1; __qty=1; __member=false; __line=false; show('page-landing'); }
+function restart(){ currentQ=0; answers={}; __mix=null; __qtys=[0,0,0]; __member=false; __line=false; show('page-landing'); }
 
 /* confetti keyframes（用 JS 注入，避免 CSS 太長）*/
 var st=document.createElement('style');
